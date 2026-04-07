@@ -2,1271 +2,921 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>PM Technician</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>PM Teknisi</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="theme-color" content="#0f172a">
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<meta name="apple-mobile-web-app-title" content="PM Teknisi">
+<meta name="theme-color" content="#1d4ed8">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-/* ─── TOKENS ─── */
 :root{
-  --bg:#0f172a;
-  --surface:#1e293b;
-  --surface2:#263348;
-  --surface3:#2d3d56;
-  --border:#334155;
-  --border2:#475569;
-  --accent:#3b82f6;
-  --accent2:#60a5fa;
-  --green:#10b981;
-  --amber:#f59e0b;
-  --red:#ef4444;
-  --purple:#a78bfa;
-  --cyan:#22d3ee;
-  --text:#f1f5f9;
-  --text2:#94a3b8;
-  --text3:#64748b;
-  --sans:'Plus Jakarta Sans',sans-serif;
-  --mono:'JetBrains Mono',monospace;
-  --radius:14px;
-  --radius-sm:8px;
-  --shadow:0 4px 24px rgba(0,0,0,0.4);
-  --shadow-lg:0 8px 40px rgba(0,0,0,0.6);
+  --blue:#1d4ed8;--blue-light:#dbeafe;--blue-dark:#1e3a8a;
+  --green:#059669;--green-light:#d1fae5;
+  --red:#dc2626;--red-light:#fee2e2;
+  --amber:#d97706;--amber-light:#fef3c7;
+  --purple:#7c3aed;
+  --gray-50:#f9fafb;--gray-100:#f3f4f6;--gray-200:#e5e7eb;
+  --gray-300:#d1d5db;--gray-400:#9ca3af;--gray-500:#6b7280;
+  --gray-600:#4b5563;--gray-700:#374151;--gray-900:#111827;
+  --text:#111827;--text2:#374151;--text3:#6b7280;
+  --bg:#f1f5f9;--surface:#fff;--border:#e5e7eb;
+  --font:'Plus Jakarta Sans',sans-serif;
+  --nav-h:72px;--safe-b:env(safe-area-inset-bottom,0px);
+  --r:16px;--r-sm:10px;--r-xs:8px;
+  --shadow-sm:0 1px 4px rgba(0,0,0,.07);
+  --shadow:0 4px 14px rgba(0,0,0,.10);
+  --shadow-lg:0 10px 36px rgba(0,0,0,.16);
 }
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;}
+html{height:100%;overscroll-behavior:none;}
+body{font-family:var(--font);background:var(--bg);color:var(--text);
+  min-height:100dvh;overflow-x:hidden;
+  padding-bottom:calc(var(--nav-h) + var(--safe-b));}
+img{display:block;max-width:100%;}
+button{font-family:var(--font);cursor:pointer;border:none;outline:none;background:none;}
+input,select,textarea{font-family:var(--font);outline:none;-webkit-appearance:none;}
 
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-html{scroll-behavior:smooth;}
-body{
-  background:var(--bg);
-  color:var(--text);
-  font-family:var(--sans);
-  min-height:100vh;
-  min-height:100dvh;
-  padding-bottom:80px;
-  overflow-x:hidden;
+/* HEADER */
+.hdr{
+  position:sticky;top:0;z-index:40;
+  background:var(--blue);color:#fff;
+  padding:10px 16px;
+  padding-top:max(10px,env(safe-area-inset-top));
+  display:flex;align-items:center;justify-content:space-between;
+  box-shadow:0 2px 10px rgba(29,78,216,.4);
 }
-
-/* ─── SCROLLBAR ─── */
-::-webkit-scrollbar{width:4px;}
-::-webkit-scrollbar-track{background:transparent;}
-::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px;}
-
-/* ─── HEADER ─── */
-.header{
-  background:linear-gradient(135deg,#0f172a 0%,#1e293b 100%);
-  border-bottom:1px solid var(--border);
-  padding:16px 20px 14px;
-  position:sticky;top:0;z-index:50;
-  backdrop-filter:blur(12px);
-}
-.header-inner{display:flex;align-items:center;justify-content:space-between;}
-.header-logo{display:flex;align-items:center;gap:10px;}
-.logo-badge{
-  background:var(--accent);
-  color:#fff;
-  font-family:var(--mono);
-  font-size:9px;font-weight:700;
-  padding:4px 8px;letter-spacing:2px;
-  border-radius:5px;
-}
-.header-title{font-size:15px;font-weight:800;letter-spacing:-0.3px;}
-.header-sub{font-size:10px;color:var(--text3);margin-top:1px;font-family:var(--mono);}
-.header-sync{
-  font-family:var(--mono);font-size:9px;
-  padding:4px 10px;border-radius:20px;
-  border:1px solid var(--border);
-  color:var(--text2);cursor:pointer;
-  transition:all .2s;
-}
-.header-sync:hover{border-color:var(--accent);color:var(--accent);}
-.sync-ok{color:var(--green);border-color:rgba(16,185,129,.3);}
-.sync-loading{color:var(--amber);border-color:rgba(245,158,11,.3);}
-.sync-err{color:var(--red);border-color:rgba(239,68,68,.3);}
-
-/* ─── BOTTOM NAV ─── */
-.bottom-nav{
-  position:fixed;bottom:0;left:0;right:0;z-index:50;
-  background:rgba(15,23,42,.92);
-  backdrop-filter:blur(16px);
-  border-top:1px solid var(--border);
-  padding:8px 0 max(8px, env(safe-area-inset-bottom));
-  display:flex;
-}
-.nav-tab{
-  flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;
-  padding:6px 8px;cursor:pointer;border:none;background:none;
-  color:var(--text3);font-family:var(--sans);font-size:9px;font-weight:600;
-  letter-spacing:.3px;text-transform:uppercase;
-  transition:color .2s;
-}
-.nav-tab.active{color:var(--accent);}
-.nav-tab svg{width:22px;height:22px;stroke-width:2;}
-.nav-badge{
-  position:absolute;top:-2px;right:-4px;
-  background:var(--red);color:#fff;
-  font-family:var(--mono);font-size:8px;font-weight:700;
-  width:16px;height:16px;border-radius:50%;
+.hdr-left{display:flex;align-items:center;gap:10px;}
+.hdr-ava{
+  width:40px;height:40px;border-radius:50%;
+  background:rgba(255,255,255,.22);border:2px solid rgba(255,255,255,.35);
   display:flex;align-items:center;justify-content:center;
-  border:2px solid var(--bg);
+  font-size:15px;font-weight:800;color:#fff;flex-shrink:0;
 }
-.nav-icon-wrap{position:relative;}
-
-/* ─── PAGE SYSTEM ─── */
-.page{display:none;padding:18px 16px;animation:fadeIn .25s ease;}
-.page.active{display:block;}
-@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-
-/* ─── SECTION HEADER ─── */
-.sec-label{
-  font-family:var(--mono);font-size:9px;font-weight:700;
-  letter-spacing:2px;color:var(--text3);text-transform:uppercase;
-  margin-bottom:14px;display:flex;align-items:center;gap:8px;
+.hdr-name{font-size:14px;font-weight:800;}
+.hdr-role{font-size:10px;opacity:.7;margin-top:1px;}
+.sync-btn{
+  background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);
+  color:#fff;border-radius:20px;padding:7px 13px;
+  font-size:11px;font-weight:700;display:flex;align-items:center;gap:6px;
 }
-.sec-label::after{content:'';flex:1;height:1px;background:var(--border);}
+.sync-btn:active{background:rgba(255,255,255,.28);}
+.s-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.5);flex-shrink:0;}
+.s-dot.ok{background:#4ade80;}
+.s-dot.loading{background:#fbbf24;animation:bl 1s infinite;}
+.s-dot.err{background:#f87171;}
+@keyframes bl{0%,100%{opacity:1}50%{opacity:.2}}
 
-/* ─── CARD ─── */
-.card{
-  background:var(--surface);
-  border:1px solid var(--border);
-  border-radius:var(--radius);
-  padding:18px;
-  margin-bottom:14px;
+/* BOTTOM NAV */
+.bnav{
+  position:fixed;bottom:0;left:0;right:0;z-index:40;
+  background:#fff;border-top:1px solid var(--border);
+  box-shadow:0 -2px 16px rgba(0,0,0,.08);
+  display:grid;grid-template-columns:1fr 1fr;
+  height:calc(var(--nav-h) + var(--safe-b));
+  padding-bottom:var(--safe-b);
+}
+.nb{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:3px;color:var(--gray-400);font-size:10px;font-weight:700;
+  padding:8px 4px;transition:color .15s;position:relative;
+}
+.nb.active{color:var(--blue);}
+.nb-icon{
+  width:46px;height:30px;display:flex;align-items:center;justify-content:center;
+  border-radius:14px;transition:background .15s;
+}
+.nb.active .nb-icon{background:var(--blue-light);}
+.nb-icon svg{width:22px;height:22px;stroke-width:2.2;}
+.nb-badge{
+  position:absolute;top:6px;right:calc(50% - 30px);
+  background:var(--red);color:#fff;font-size:9px;font-weight:900;
+  min-width:18px;height:18px;border-radius:9px;padding:0 4px;
+  display:flex;align-items:center;justify-content:center;border:2px solid #fff;
+}
+
+/* PAGE SYSTEM */
+.page{display:none;}
+.page.active{display:block;animation:pIn .22s ease;}
+@keyframes pIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+
+/* FORM CARD */
+.fcard{
+  background:#fff;border-radius:var(--r);margin:12px 12px 0;
+  box-shadow:var(--shadow-sm);overflow:hidden;
+  border:1px solid var(--gray-200);
+}
+.fcard-head{
+  padding:13px 16px 10px;border-bottom:1px solid var(--gray-100);
+  display:flex;align-items:center;gap:10px;
+}
+.fcard-ico{
+  width:34px;height:34px;border-radius:var(--r-xs);
+  display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;
+}
+.fcard-title{font-size:13px;font-weight:800;color:var(--text);}
+
+/* FIELD ROW */
+.frow{
+  display:flex;align-items:center;min-height:58px;
+  padding:0 16px;border-bottom:1px solid var(--gray-100);gap:12px;
+}
+.frow:last-child{border-bottom:none;}
+.frow-lbl{
+  font-size:13px;font-weight:700;color:var(--text2);
+  min-width:82px;flex-shrink:0;display:flex;align-items:center;gap:5px;
+}
+.rdot{width:5px;height:5px;border-radius:50%;background:var(--red);display:inline-block;}
+.frow-inp{
+  flex:1;background:transparent;border:none;
+  font-family:var(--font);font-size:15px;color:var(--text);
+  padding:16px 0;min-width:0;
+}
+.frow-inp::placeholder{color:var(--gray-300);}
+.frow-inp[readonly]{color:var(--blue);font-weight:700;}
+.frow select.frow-inp{color:var(--text);background:transparent;}
+.frow select.frow-inp option{color:var(--text);background:#fff;}
+
+/* TEXTAREA FIELD */
+.ftxt{padding:14px 16px;border-bottom:1px solid var(--gray-100);}
+.ftxt:last-child{border-bottom:none;}
+.ftxt-lbl{font-size:12px;font-weight:700;color:var(--text3);margin-bottom:8px;display:flex;align-items:center;gap:5px;}
+.ftxt textarea{
+  width:100%;background:var(--gray-50);
+  border:1.5px solid var(--gray-200);border-radius:var(--r-sm);
+  font-family:var(--font);font-size:15px;color:var(--text);
+  padding:13px 14px;resize:none;min-height:80px;line-height:1.5;
   transition:border-color .2s;
 }
-.card:hover{border-color:var(--border2);}
+.ftxt textarea:focus{border-color:var(--blue);background:#fff;}
 
-/* ─── FORM ELEMENTS ─── */
-.field{margin-bottom:18px;}
-.field-label{
-  font-family:var(--mono);font-size:9px;font-weight:700;
-  color:var(--text2);letter-spacing:1.5px;text-transform:uppercase;
-  margin-bottom:8px;display:flex;align-items:center;gap:6px;
+/* TIME ROW */
+.time-grid{display:grid;grid-template-columns:1fr 22px 1fr;align-items:center;gap:4px;}
+.time-sep{text-align:center;color:var(--gray-400);font-size:16px;font-weight:600;}
+.time-inp{
+  background:var(--gray-50);border:1.5px solid var(--gray-200);
+  border-radius:var(--r-sm);padding:13px 8px;
+  font-family:var(--font);font-size:16px;color:var(--text);
+  width:100%;text-align:center;transition:border-color .2s;
 }
-.required-dot{
-  width:5px;height:5px;border-radius:50%;
-  background:var(--red);display:inline-block;
-}
-.field input,.field select,.field textarea{
-  width:100%;
-  background:var(--surface2);
-  border:1.5px solid var(--border);
-  border-radius:var(--radius-sm);
-  color:var(--text);
-  font-family:var(--sans);font-size:14px;
-  padding:13px 14px;
-  outline:none;
-  transition:border-color .2s,box-shadow .2s;
-  -webkit-appearance:none;
-}
-.field input:focus,.field select:focus,.field textarea:focus{
-  border-color:var(--accent);
-  box-shadow:0 0 0 3px rgba(59,130,246,.15);
-}
-.field textarea{resize:none;min-height:90px;line-height:1.6;}
-.field select option{background:var(--surface);}
+.time-inp:focus{border-color:var(--blue);background:#fff;outline:none;}
 
-/* Time range */
-.time-row{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center;}
-.time-sep{color:var(--text3);font-family:var(--mono);font-size:12px;text-align:center;padding-top:8px;}
-
-/* ─── PHOTO INPUT ─── */
-.photo-grid{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:10px;
+/* PHOTO SECTION */
+.photo-sec{
+  background:#fff;border-radius:var(--r);margin:12px 12px 0;
+  padding:14px 16px;box-shadow:var(--shadow-sm);border:1px solid var(--gray-200);
 }
+.photo-sec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.photo-sec-title{font-size:13px;font-weight:800;}
+.photo-sec-count{
+  font-size:11px;font-weight:800;color:var(--blue);
+  background:var(--blue-light);padding:3px 10px;border-radius:10px;
+}
+.photo-cta{
+  border:2px dashed var(--blue);border-radius:var(--r-sm);
+  background:var(--blue-light);
+  padding:22px 16px;display:flex;align-items:center;gap:14px;cursor:pointer;
+  transition:background .15s;
+}
+.photo-cta:active{background:#bfdbfe;}
+.photo-cta-ico{font-size:36px;line-height:1;flex-shrink:0;}
+.photo-cta-title{font-size:15px;font-weight:800;color:var(--blue);}
+.photo-cta-sub{font-size:11px;color:var(--blue);opacity:.7;margin-top:2px;}
+.photo-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;display:none;}
 .photo-slot{
-  aspect-ratio:1;
-  background:var(--surface2);
-  border:1.5px dashed var(--border);
-  border-radius:10px;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  cursor:pointer;
-  position:relative;overflow:hidden;
-  transition:all .2s;
+  aspect-ratio:1;border-radius:var(--r-sm);
+  background:var(--gray-100);border:1.5px solid var(--gray-200);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;position:relative;overflow:hidden;
 }
-.photo-slot:hover{border-color:var(--accent);background:rgba(59,130,246,.05);}
-.photo-slot img{
-  position:absolute;inset:0;width:100%;height:100%;
-  object-fit:cover;border-radius:9px;
-}
-.photo-slot .photo-icon{font-size:22px;margin-bottom:4px;}
-.photo-slot .photo-txt{font-size:9px;color:var(--text3);font-family:var(--mono);}
-.photo-slot .photo-del{
+.photo-slot img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+.photo-slot-add{border-style:dashed;border-color:var(--gray-300);}
+.photo-slot-add-icon{font-size:24px;color:var(--gray-400);}
+.pdel{
   position:absolute;top:4px;right:4px;
-  background:rgba(239,68,68,.9);color:#fff;
-  border:none;border-radius:50%;width:22px;height:22px;
-  font-size:12px;cursor:pointer;
+  background:var(--red);color:#fff;border:2px solid #fff;
+  border-radius:50%;width:24px;height:24px;
   display:flex;align-items:center;justify-content:center;
-  z-index:2;
+  font-size:12px;font-weight:900;z-index:2;
 }
-.photo-slot.filled{border-style:solid;border-color:var(--border2);}
-.photo-slot.disabled{opacity:.35;pointer-events:none;}
+.add-more-btn{
+  width:100%;padding:13px;margin-top:10px;
+  border:2px dashed var(--gray-300);border-radius:var(--r-sm);
+  background:var(--gray-50);font-size:13px;font-weight:700;color:var(--gray-400);
+  transition:all .15s;display:none;
+}
+.add-more-btn:active{background:var(--gray-100);}
 
-/* ─── BUTTON ─── */
-.btn-primary{
-  width:100%;padding:16px;
-  background:linear-gradient(135deg,var(--accent),#1d4ed8);
-  border:none;border-radius:var(--radius);
-  color:#fff;font-family:var(--sans);font-size:15px;font-weight:700;
-  cursor:pointer;letter-spacing:.2px;
-  box-shadow:0 4px 16px rgba(59,130,246,.35);
-  transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px;
+/* SUBMIT BUTTON */
+.submit-wrap{padding:16px 12px 8px;}
+.btn-submit{
+  width:100%;padding:19px;border-radius:var(--r);
+  background:var(--blue);color:#fff;
+  font-family:var(--font);font-size:17px;font-weight:800;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  box-shadow:0 4px 18px rgba(29,78,216,.4);
+  transition:transform .1s,box-shadow .1s;letter-spacing:.2px;
 }
-.btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(59,130,246,.45);}
-.btn-primary:active{transform:translateY(0);}
-.btn-primary:disabled{opacity:.5;pointer-events:none;}
-.btn-ghost{
-  padding:10px 18px;
-  background:transparent;border:1.5px solid var(--border);
-  border-radius:var(--radius-sm);color:var(--text2);
-  font-family:var(--sans);font-size:12px;font-weight:600;
-  cursor:pointer;transition:all .2s;
-}
-.btn-ghost:hover{border-color:var(--accent);color:var(--accent);}
-.btn-sm{padding:7px 14px;font-size:11px;}
+.btn-submit:active{transform:scale(.98);}
+.btn-submit:disabled{background:var(--gray-300);box-shadow:none;}
+.btn-submit svg{width:20px;height:20px;flex-shrink:0;}
 
-/* ─── ALERT ─── */
-.alert{
-  padding:12px 16px;border-radius:var(--radius-sm);
-  font-size:12px;margin-bottom:14px;
-  display:flex;align-items:flex-start;gap:10px;
-}
-.alert-info{background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.25);color:#93c5fd;}
-.alert-success{background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.25);color:#6ee7b7;}
-.alert-warn{background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25);color:#fcd34d;}
-.alert-error{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);color:#fca5a5;}
+/* SECTION HEADER */
+.sec-hdr{padding:20px 16px 10px;display:flex;align-items:center;justify-content:space-between;}
+.sec-title{font-size:13px;font-weight:800;color:var(--text2);}
+.sec-badge{font-size:11px;font-weight:800;color:var(--blue);background:var(--blue-light);padding:2px 9px;border-radius:10px;}
 
-/* ─── WO CARDS ─── */
-.wo-card{
-  background:var(--surface);
-  border:1px solid var(--border);
-  border-radius:var(--radius);
-  padding:16px;margin-bottom:12px;
-  cursor:pointer;transition:all .2s;
-  position:relative;overflow:hidden;
+/* REPORT CARD */
+.rcard{
+  background:#fff;margin:0 12px 10px;border-radius:var(--r);
+  border:1px solid var(--gray-200);box-shadow:var(--shadow-sm);
+  overflow:hidden;cursor:pointer;transition:box-shadow .15s;
 }
-.wo-card::before{
-  content:'';position:absolute;left:0;top:0;bottom:0;width:3px;
-  background:var(--border);border-radius:3px 0 0 3px;
-  transition:background .2s;
-}
-.wo-card.prio-c::before{background:var(--red);}
-.wo-card.prio-h::before{background:var(--amber);}
-.wo-card.prio-m::before{background:var(--accent);}
-.wo-card.prio-l::before{background:var(--green);}
-.wo-card:hover{border-color:var(--border2);transform:translateY(-1px);box-shadow:var(--shadow);}
-.wo-title{font-size:14px;font-weight:700;margin-bottom:6px;line-height:1.3;}
-.wo-meta{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;}
-.wo-chip{
-  font-family:var(--mono);font-size:9px;font-weight:600;
-  padding:3px 8px;border-radius:20px;letter-spacing:.3px;
-}
-.chip-blue{background:rgba(59,130,246,.15);color:var(--accent2);}
-.chip-amber{background:rgba(245,158,11,.15);color:#fcd34d;}
-.chip-green{background:rgba(16,185,129,.15);color:#6ee7b7;}
-.chip-red{background:rgba(239,68,68,.15);color:#fca5a5;}
-.chip-purple{background:rgba(167,139,250,.15);color:var(--purple);}
-.chip-gray{background:rgba(100,116,139,.15);color:var(--text2);}
-.chip-cyan{background:rgba(34,211,238,.15);color:var(--cyan);}
-.wo-desc{font-size:12px;color:var(--text2);line-height:1.5;margin-bottom:10px;}
-.wo-footer{display:flex;align-items:center;justify-content:space-between;}
-.wo-pic{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);}
-.wo-avatar{
-  width:26px;height:26px;border-radius:50%;
-  background:linear-gradient(135deg,var(--accent),var(--purple));
-  display:flex;align-items:center;justify-content:center;
-  font-size:11px;font-weight:700;color:#fff;
-}
-.wo-photos-preview{display:flex;gap:5px;}
-.wo-photo-thumb{
-  width:36px;height:36px;border-radius:6px;
-  object-fit:cover;border:1.5px solid var(--border);
-  cursor:pointer;transition:transform .15s;
-}
-.wo-photo-thumb:hover{transform:scale(1.08);}
+.rcard:active{box-shadow:var(--shadow);}
+.rcard-top{padding:11px 14px 8px;border-bottom:1px solid var(--gray-100);}
+.rcard-date{font-size:11px;color:var(--text3);font-weight:600;margin-bottom:4px;}
+.rcard-title{font-size:14px;font-weight:800;line-height:1.3;}
+.rcard-bot{padding:8px 14px 12px;}
+.rcard-chips{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:6px;}
+.rcard-photos{display:flex;gap:5px;}
+.rcard-thumb{width:50px;height:50px;border-radius:var(--r-xs);object-fit:cover;border:1px solid var(--gray-200);}
 
-/* ─── FILTER BAR ─── */
-.filter-bar{
-  display:flex;gap:8px;margin-bottom:16px;
-  overflow-x:auto;padding-bottom:2px;
+/* CHIP */
+.chip{display:inline-flex;align-items:center;font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;}
+.chip-blue{background:var(--blue-light);color:var(--blue);}
+.chip-green{background:var(--green-light);color:var(--green);}
+.chip-red{background:var(--red-light);color:var(--red);}
+.chip-amber{background:var(--amber-light);color:var(--amber);}
+.chip-gray{background:var(--gray-100);color:var(--gray-600);}
+.chip-purple{background:#ede9fe;color:var(--purple);}
+
+/* WO PAGE */
+.stats-strip{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  background:#fff;border-bottom:1px solid var(--border);
 }
-.filter-bar::-webkit-scrollbar{height:0;}
-.filter-chip{
-  flex-shrink:0;
-  padding:7px 14px;
-  background:var(--surface);border:1.5px solid var(--border);
-  border-radius:20px;color:var(--text2);
-  font-family:var(--mono);font-size:10px;font-weight:600;
-  cursor:pointer;white-space:nowrap;transition:all .2s;
+.stat-col{padding:12px 6px;text-align:center;border-right:1px solid var(--border);}
+.stat-col:last-child{border-right:none;}
+.stat-n{font-size:24px;font-weight:900;line-height:1;}
+.stat-n.open{color:var(--blue);}
+.stat-n.prog{color:var(--amber);}
+.stat-n.done{color:var(--green);}
+.stat-l{font-size:10px;font-weight:700;color:var(--text3);margin-top:3px;letter-spacing:.3px;}
+
+.search-bar-wrap{
+  padding:10px 12px;background:#fff;
+  border-bottom:1px solid var(--border);
+  position:sticky;top:56px;z-index:30;
 }
-.filter-chip.active{
-  background:rgba(59,130,246,.12);
-  border-color:var(--accent);color:var(--accent);
-}
-.search-input{
-  width:100%;background:var(--surface);
-  border:1.5px solid var(--border);border-radius:var(--radius-sm);
-  color:var(--text);font-family:var(--sans);font-size:13px;
-  padding:11px 14px 11px 38px;outline:none;
-  transition:border-color .2s;margin-bottom:12px;
-}
-.search-input:focus{border-color:var(--accent);}
 .search-wrap{position:relative;}
-.search-wrap::before{
-  content:'🔍';position:absolute;left:13px;top:50%;
-  transform:translateY(-50%);font-size:13px;pointer-events:none;
+.search-ico{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--gray-400);}
+.search-ico svg{width:18px;height:18px;stroke-width:2.2;}
+.search-inp{
+  width:100%;background:var(--gray-100);
+  border:1.5px solid transparent;border-radius:var(--r-sm);
+  font-family:var(--font);font-size:15px;color:var(--text);
+  padding:12px 14px 12px 40px;transition:all .2s;
 }
+.search-inp:focus{background:#fff;border-color:var(--blue);outline:none;}
 
-/* ─── DETAIL SHEET ─── */
-.sheet-overlay{
-  display:none;position:fixed;inset:0;z-index:100;
-  background:rgba(0,0,0,.6);backdrop-filter:blur(4px);
+.filter-row{
+  display:flex;gap:8px;overflow-x:auto;padding:10px 12px;
+  background:#fff;border-bottom:1px solid var(--border);
 }
-.sheet-overlay.open{display:flex;align-items:flex-end;}
+.filter-row::-webkit-scrollbar{display:none;}
+.fpill{
+  flex-shrink:0;padding:8px 16px;border-radius:20px;
+  background:var(--gray-100);border:1.5px solid transparent;
+  font-size:12px;font-weight:800;color:var(--gray-500);cursor:pointer;
+  white-space:nowrap;transition:all .15s;
+}
+.fpill.active{background:var(--blue-light);border-color:var(--blue);color:var(--blue);}
+.fpill:active{transform:scale(.97);}
+
+.wo-body{padding:10px 12px;}
+.wo-card{
+  background:#fff;border-radius:var(--r);border:1px solid var(--gray-200);
+  margin-bottom:10px;cursor:pointer;box-shadow:var(--shadow-sm);
+  display:flex;overflow:hidden;transition:box-shadow .15s;
+}
+.wo-card:active{box-shadow:var(--shadow);}
+.wo-stripe{width:5px;flex-shrink:0;}
+.wo-stripe.prio-c{background:var(--red);}
+.wo-stripe.prio-h{background:var(--amber);}
+.wo-stripe.prio-m{background:var(--blue);}
+.wo-stripe.prio-l{background:var(--green);}
+.wo-inner{flex:1;padding:13px 14px;}
+.wo-title{font-size:14px;font-weight:800;color:var(--text);margin-bottom:7px;line-height:1.3;}
+.wo-chips{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:9px;}
+.wo-foot{display:flex;align-items:center;justify-content:space-between;}
+.wo-pic{display:flex;align-items:center;gap:7px;}
+.wo-ava{
+  width:26px;height:26px;border-radius:50%;
+  background:linear-gradient(135deg,var(--blue),var(--purple));
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;font-weight:900;color:#fff;flex-shrink:0;
+}
+.wo-picname{font-size:11px;font-weight:600;color:var(--text3);}
+.wo-target{font-size:10px;color:var(--text3);}
+.wo-mini-photos{display:flex;gap:5px;margin-top:8px;}
+.wo-mini-thumb{width:42px;height:42px;border-radius:var(--r-xs);object-fit:cover;border:1px solid var(--gray-200);}
+
+/* BOTTOM SHEET */
+.sheet-ov{
+  display:none;position:fixed;inset:0;z-index:80;
+  background:rgba(0,0,0,.4);backdrop-filter:blur(3px);
+}
+.sheet-ov.open{display:flex;align-items:flex-end;}
 .sheet{
-  width:100%;max-height:88vh;
-  background:var(--surface);
-  border-radius:20px 20px 0 0;
-  border-top:1px solid var(--border);
-  overflow-y:auto;
-  animation:slideUp .3s cubic-bezier(.4,0,.2,1);
+  width:100%;max-height:92dvh;background:#fff;
+  border-radius:22px 22px 0 0;overflow:hidden;
+  display:flex;flex-direction:column;
+  animation:shUp .28s cubic-bezier(.4,0,.2,1);
 }
-@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
-.sheet-handle{
-  width:36px;height:4px;background:var(--border2);
-  border-radius:2px;margin:12px auto 0;
-}
-.sheet-head{padding:16px 20px 12px;border-bottom:1px solid var(--border);}
-.sheet-title{font-size:16px;font-weight:800;}
-.sheet-body{padding:20px;}
-.sheet-field{margin-bottom:16px;}
-.sheet-field-label{
-  font-family:var(--mono);font-size:9px;font-weight:700;
-  color:var(--text3);letter-spacing:1.5px;text-transform:uppercase;
-  margin-bottom:5px;
-}
-.sheet-field-val{font-size:13px;color:var(--text);line-height:1.5;}
-.sheet-photos{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px;}
-.sheet-photo{
-  aspect-ratio:1;border-radius:10px;
-  object-fit:cover;cursor:pointer;
-  border:1.5px solid var(--border);
-  transition:transform .15s;width:100%;
-}
-.sheet-photo:hover{transform:scale(1.03);}
-
-/* ─── LIGHTBOX ─── */
-.lightbox{
-  display:none;position:fixed;inset:0;z-index:200;
-  background:rgba(0,0,0,.95);
-  align-items:center;justify-content:center;
-}
-.lightbox.open{display:flex;}
-.lightbox img{
-  max-width:94vw;max-height:88vh;
-  object-fit:contain;border-radius:8px;
-}
-.lightbox-close{
-  position:absolute;top:16px;right:20px;
-  background:rgba(255,255,255,.1);border:none;
-  color:#fff;font-size:20px;cursor:pointer;
-  width:40px;height:40px;border-radius:50%;
+@keyframes shUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.sheet-drag{width:40px;height:4px;background:var(--gray-300);border-radius:2px;margin:12px auto 0;flex-shrink:0;}
+.sheet-head{padding:14px 18px 12px;border-bottom:1px solid var(--gray-100);flex-shrink:0;}
+.sheet-head-row{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:8px;}
+.sheet-title{font-size:17px;font-weight:900;color:var(--text);line-height:1.3;}
+.sheet-close{
+  width:32px;height:32px;border-radius:50%;background:var(--gray-100);
   display:flex;align-items:center;justify-content:center;
+  color:var(--gray-500);font-size:15px;font-weight:900;flex-shrink:0;
 }
-.lightbox-nav{
-  position:absolute;top:50%;transform:translateY(-50%);
-  background:rgba(255,255,255,.12);border:none;color:#fff;
-  font-size:20px;cursor:pointer;
-  width:44px;height:44px;border-radius:50%;
-  display:flex;align-items:center;justify-content:center;
+.sheet-chips{display:flex;flex-wrap:wrap;gap:6px;}
+.sheet-body{overflow-y:auto;padding:16px 18px;flex:1;}
+.drow{margin-bottom:16px;}
+.drow-lbl{font-size:10px;font-weight:800;color:var(--text3);letter-spacing:.8px;text-transform:uppercase;margin-bottom:4px;}
+.drow-val{font-size:14px;color:var(--text);line-height:1.5;}
+.sheet-photos{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:6px;}
+.sheet-photo{aspect-ratio:1;border-radius:var(--r-sm);object-fit:cover;border:1px solid var(--gray-200);width:100%;cursor:pointer;}
+.sheet-photo:active{transform:scale(.97);}
+.btn-action{
+  width:100%;padding:17px;border-radius:var(--r);
+  background:var(--blue);color:#fff;
+  font-family:var(--font);font-size:15px;font-weight:800;
+  display:flex;align-items:center;justify-content:center;gap:8px;margin-top:4px;
+  box-shadow:0 4px 14px rgba(29,78,216,.32);
 }
-.lightbox-nav.prev{left:12px;}
-.lightbox-nav.next{right:12px;}
+.btn-action:active{transform:scale(.98);}
 
-/* ─── TOAST ─── */
+/* LOGIN */
+.login-screen{
+  position:fixed;inset:0;z-index:100;
+  background:linear-gradient(160deg,var(--blue-dark) 0%,var(--blue) 100%);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;
+}
+.login-card{
+  background:#fff;border-radius:22px;width:100%;max-width:380px;
+  padding:30px 24px;box-shadow:0 24px 60px rgba(0,0,0,.3);
+}
+.login-icon{font-size:44px;text-align:center;margin-bottom:10px;}
+.login-title{font-size:22px;font-weight:900;text-align:center;margin-bottom:4px;}
+.login-sub{font-size:13px;color:var(--text3);text-align:center;margin-bottom:26px;}
+.login-lbl{font-size:12px;font-weight:800;color:var(--text2);margin-bottom:8px;display:block;}
+.login-inp{
+  width:100%;padding:16px 14px;background:var(--gray-50);
+  border:1.5px solid var(--gray-200);border-radius:var(--r-sm);
+  font-family:var(--font);font-size:17px;color:var(--text);
+  transition:border-color .2s;margin-bottom:16px;
+}
+.login-inp:focus{border-color:var(--blue);background:#fff;}
+.btn-login{
+  width:100%;padding:17px;border-radius:var(--r);
+  background:var(--blue);color:#fff;
+  font-family:var(--font);font-size:16px;font-weight:900;
+  box-shadow:0 4px 18px rgba(29,78,216,.45);letter-spacing:.2px;
+}
+.btn-login:active{transform:scale(.98);}
+
+/* LIGHTBOX */
+.lb{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.97);align-items:center;justify-content:center;}
+.lb.open{display:flex;}
+.lb img{max-width:100%;max-height:90dvh;object-fit:contain;border-radius:4px;}
+.lb-close{position:absolute;top:max(16px,env(safe-area-inset-top));right:16px;background:rgba(255,255,255,.12);color:#fff;width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;}
+.lb-nav{position:absolute;top:50%;transform:translateY(-50%);background:rgba(255,255,255,.12);color:#fff;width:50px;height:50px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;}
+.lb-nav.prev{left:8px;}.lb-nav.next{right:8px;}
+
+/* TOAST */
 .toast{
-  position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(20px);
-  background:var(--surface2);border:1px solid var(--border);
-  border-radius:var(--radius);padding:12px 20px;
-  font-size:13px;font-weight:600;color:var(--text);
-  z-index:999;opacity:0;pointer-events:none;
-  transition:all .3s;white-space:nowrap;
-  box-shadow:var(--shadow);max-width:90vw;text-align:center;
-}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
-.toast.success{border-left:3px solid var(--green);}
-.toast.error{border-left:3px solid var(--red);}
-.toast.warn{border-left:3px solid var(--amber);}
-
-/* ─── CONFIG SCREEN ─── */
-.config-screen{
-  position:fixed;inset:0;z-index:300;
-  background:var(--bg);display:flex;align-items:center;justify-content:center;
-  padding:24px;
-}
-.config-box{
-  width:100%;max-width:420px;
-  background:var(--surface);border:1px solid var(--border);
-  border-radius:var(--radius);border-top:3px solid var(--accent);
-  padding:28px;
+  position:fixed;bottom:calc(var(--nav-h) + var(--safe-b) + 14px);
+  left:50%;transform:translateX(-50%) translateY(8px);
+  background:var(--gray-900);color:#fff;border-radius:var(--r-sm);
+  padding:13px 22px;font-size:13px;font-weight:700;
+  z-index:99;opacity:0;pointer-events:none;
+  transition:all .25s;max-width:88vw;text-align:center;
   box-shadow:var(--shadow-lg);
 }
-.config-logo{font-size:36px;text-align:center;margin-bottom:12px;}
-.config-title{
-  font-family:var(--mono);font-size:12px;font-weight:700;
-  letter-spacing:2px;color:var(--accent);
-  text-align:center;margin-bottom:4px;
-}
-.config-sub{font-size:11px;color:var(--text3);text-align:center;margin-bottom:22px;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.toast.ok{background:#064e3b;}.toast.warn{background:#78350f;}.toast.err{background:#7f1d1d;}
 
-/* ─── EMPTY STATE ─── */
-.empty{text-align:center;padding:48px 20px;color:var(--text3);}
-.empty-icon{font-size:48px;margin-bottom:12px;}
-.empty-title{font-size:15px;font-weight:700;color:var(--text2);margin-bottom:6px;}
-.empty-sub{font-size:12px;line-height:1.6;}
-
-/* ─── STATUS BADGE ─── */
-.status-badge{
-  display:inline-flex;align-items:center;gap:5px;
-  font-family:var(--mono);font-size:9px;font-weight:700;
-  padding:4px 9px;border-radius:20px;letter-spacing:.5px;
-}
-.status-dot{width:6px;height:6px;border-radius:50%;}
-
-/* ─── REPORT HISTORY ─── */
-.report-card{
-  background:var(--surface);border:1px solid var(--border);
-  border-radius:var(--radius);padding:14px 16px;
-  margin-bottom:10px;cursor:pointer;transition:all .2s;
-}
-.report-card:hover{border-color:var(--border2);}
-.report-date{font-family:var(--mono);font-size:10px;color:var(--text3);margin-bottom:5px;}
-.report-title{font-size:13px;font-weight:700;margin-bottom:4px;}
-.report-meta{font-size:11px;color:var(--text2);}
-
-/* ─── STATS ROW ─── */
-.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px;}
-.stat-box{
-  background:var(--surface);border:1px solid var(--border);
-  border-radius:var(--radius-sm);padding:14px 12px;text-align:center;
-}
-.stat-num{font-family:var(--mono);font-size:22px;font-weight:700;line-height:1;}
-.stat-lbl{font-family:var(--mono);font-size:8px;color:var(--text3);
-  letter-spacing:1px;text-transform:uppercase;margin-top:4px;}
-
-/* ─── RESPONSIVE ─── */
-@media(min-width:500px){
-  .photo-grid{grid-template-columns:repeat(4,1fr);}
-  .page{padding:20px 20px;}
-}
+/* EMPTY */
+.empty{text-align:center;padding:56px 24px;color:var(--text3);}
+.empty-ico{font-size:56px;margin-bottom:12px;}
+.empty-title{font-size:16px;font-weight:800;color:var(--text2);margin-bottom:6px;}
+.empty-sub{font-size:13px;line-height:1.6;}
 </style>
 </head>
 <body>
 
-<!-- CONFIG SCREEN -->
-<div class="config-screen" id="configScreen">
-  <div class="config-box">
-    <div class="config-logo">⚙️</div>
-    <div class="config-title">PM TECHNICIAN</div>
-    <div class="config-sub">Form Laporan & Daftar WO<br>Masukkan GAS URL untuk terhubung ke PM Dashboard</div>
-
-    <div class="field">
-      <div class="field-label">GAS Web App URL</div>
-      <input type="url" id="cfg-url" placeholder="https://script.google.com/macros/s/..." style="font-size:12px;">
-    </div>
-    <div class="field">
-      <div class="field-label">Nama Teknisi</div>
-      <input type="text" id="cfg-name" placeholder="Nama lengkap kamu...">
-    </div>
-    <button class="btn-primary" onclick="saveConfig()">
-      <span>Mulai →</span>
-    </button>
-    <div style="margin-top:12px;text-align:center;">
-      <button class="btn-ghost btn-sm" onclick="startOffline()">Lanjutkan tanpa koneksi</button>
-    </div>
+<!-- LOGIN -->
+<div class="login-screen" id="loginSc">
+  <div class="login-card">
+    <div class="login-icon">🔧</div>
+    <div class="login-title">PM Teknisi</div>
+    <div class="login-sub">Masukkan nama untuk mulai</div>
+    <label class="login-lbl">Nama Teknisi</label>
+    <input class="login-inp" id="cfg-name" type="text" placeholder="Nama lengkap..."
+      autocomplete="name" inputmode="text" enterkeyhint="go"
+      onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="btn-login" onclick="doLogin()">Mulai Kerja →</button>
   </div>
 </div>
 
 <!-- HEADER -->
-<div class="header">
-  <div class="header-inner">
-    <div class="header-logo">
-      <div class="logo-badge">PM</div>
-      <div>
-        <div class="header-title">PM Technician</div>
-        <div class="header-sub" id="headerSub">—</div>
-      </div>
+<div class="hdr" id="appHdr" style="display:none;">
+  <div class="hdr-left">
+    <div class="hdr-ava" id="hdrAva">—</div>
+    <div>
+      <div class="hdr-name" id="hdrName">—</div>
+      <div class="hdr-role">PM Teknisi</div>
     </div>
-    <div id="syncBtn" class="header-sync" onclick="syncData()">⟳ Sync</div>
   </div>
+  <button class="sync-btn" id="syncBtn" onclick="syncData()">
+    <div class="s-dot" id="sDot"></div>
+    <span id="sTxt">Sync</span>
+  </button>
 </div>
 
-<!-- PAGES -->
-
-<!-- ═══ PAGE: FORM LAPORAN ═══ -->
+<!-- PAGE: LAPORAN -->
 <div class="page active" id="page-form">
 
-  <div class="alert alert-info" id="form-user-alert" style="display:none;">
-    <span>ℹ️</span>
-    <span id="form-user-text"></span>
-  </div>
-
-  <div class="sec-label">Form Laporan Pekerjaan</div>
-
-  <!-- Tanggal -->
-  <div class="field">
-    <div class="field-label"><span class="required-dot"></span> Tanggal</div>
-    <input type="date" id="f-date">
-  </div>
-
-  <!-- Teknisi -->
-  <div class="field">
-    <div class="field-label"><span class="required-dot"></span> Nama Teknisi</div>
-    <input type="text" id="f-tech" placeholder="Nama teknisi...">
-  </div>
-
-  <!-- Area/Unit -->
-  <div class="field">
-    <div class="field-label"><span class="required-dot"></span> Area / Unit</div>
-    <select id="f-area">
-      <option value="">Pilih area...</option>
-      <option>Area Produksi D</option>
-      <option>Area Produksi C</option>
-      <option>Utility</option>
-      <option>Workshop</option>
-      <option>Gudang</option>
-      <option>Kantor</option>
-      <option>Lainnya</option>
-    </select>
-  </div>
-
-  <!-- Plan / WO Terkait -->
-  <div class="field">
-    <div class="field-label">Plan / WO Terkait</div>
-    <select id="f-plan">
-      <option value="">-- Pilih WO (opsional) --</option>
-    </select>
-  </div>
-
-  <!-- Pekerjaan -->
-  <div class="field">
-    <div class="field-label"><span class="required-dot"></span> Pekerjaan / Uraian</div>
-    <textarea id="f-work" placeholder="Uraian pekerjaan yang dilakukan..."></textarea>
-  </div>
-
-  <!-- Waktu -->
-  <div class="field">
-    <div class="field-label"><span class="required-dot"></span> Waktu Kerja</div>
-    <div class="time-row">
-      <input type="time" id="f-time-start" placeholder="Mulai">
-      <div class="time-sep">→</div>
-      <input type="time" id="f-time-end" placeholder="Selesai">
+  <div class="fcard">
+    <div class="fcard-head">
+      <div class="fcard-ico" style="background:#dbeafe;">📋</div>
+      <div class="fcard-title">Informasi Pekerjaan</div>
+    </div>
+    <div class="frow">
+      <div class="frow-lbl"><span class="rdot"></span>Tanggal</div>
+      <input class="frow-inp" type="date" id="f-date">
+    </div>
+    <div class="frow">
+      <div class="frow-lbl"><span class="rdot"></span>Teknisi</div>
+      <input class="frow-inp" type="text" id="f-tech" readonly>
+    </div>
+    <div class="frow">
+      <div class="frow-lbl"><span class="rdot"></span>Area/Unit</div>
+      <select class="frow-inp" id="f-area">
+        <option value="">Pilih area...</option>
+        <option>Area Produksi D</option>
+        <option>Area Produksi C</option>
+        <option>Utility</option>
+        <option>Workshop</option>
+        <option>Gudang</option>
+        <option>Kantor</option>
+        <option>Lainnya</option>
+      </select>
+    </div>
+    <div class="frow">
+      <div class="frow-lbl">WO Terkait</div>
+      <select class="frow-inp" id="f-plan">
+        <option value="">-- Pilih WO (opsional) --</option>
+      </select>
     </div>
   </div>
 
-  <!-- Keterangan -->
-  <div class="field">
-    <div class="field-label">Keterangan / Temuan</div>
-    <textarea id="f-notes" placeholder="Temuan, kendala, atau catatan tambahan..."></textarea>
-  </div>
-
-  <!-- Foto -->
-  <div class="field">
-    <div class="field-label">Foto Dokumentasi <span style="color:var(--text3);font-size:9px;">(Maks 4)</span></div>
-    <div class="photo-grid" id="photoGrid">
-      <!-- Rendered by JS -->
+  <div class="fcard">
+    <div class="fcard-head">
+      <div class="fcard-ico" style="background:#d1fae5;">⚙️</div>
+      <div class="fcard-title">Detail Pekerjaan</div>
     </div>
-    <input type="file" id="photoInput" accept="image/*" capture="environment" style="display:none;" multiple onchange="handlePhotoInput(event)">
-  </div>
-
-  <!-- Submit -->
-  <button class="btn-primary" id="submitBtn" onclick="submitReport()">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z"/></svg>
-    <span>Kirim Laporan</span>
-  </button>
-
-  <div style="height:12px;"></div>
-
-  <!-- History laporan saya -->
-  <div class="sec-label" style="margin-top:8px;">Laporan Terakhir Saya</div>
-  <div id="myReports">
-    <div class="empty" style="padding:24px;">
-      <div class="empty-icon" style="font-size:32px;">📋</div>
-      <div class="empty-sub">Belum ada laporan</div>
+    <div class="ftxt">
+      <div class="ftxt-lbl"><span class="rdot"></span>Uraian Pekerjaan</div>
+      <textarea id="f-work" placeholder="Uraian pekerjaan yang dilakukan..." rows="3"></textarea>
     </div>
-  </div>
-
-</div>
-
-<!-- ═══ PAGE: DAFTAR WO ═══ -->
-<div class="page" id="page-wo">
-
-  <div class="stats-row" id="wo-stats">
-    <div class="stat-box"><div class="stat-num" id="st-open">—</div><div class="stat-lbl">Open</div></div>
-    <div class="stat-box"><div class="stat-num" id="st-prog">—</div><div class="stat-lbl">Progress</div></div>
-    <div class="stat-box"><div class="stat-num" id="st-done">—</div><div class="stat-lbl">Done</div></div>
-  </div>
-
-  <div class="search-wrap">
-    <input class="search-input" id="wo-search" placeholder="Cari WO, mesin, PIC..." oninput="renderWOList()">
-  </div>
-
-  <div class="filter-bar" id="wo-filters">
-    <div class="filter-chip active" data-filter="all" onclick="setFilter(this)">Semua</div>
-    <div class="filter-chip" data-filter="open" onclick="setFilter(this)">Open</div>
-    <div class="filter-chip" data-filter="assigned" onclick="setFilter(this)">Assigned</div>
-    <div class="filter-chip" data-filter="progress" onclick="setFilter(this)">In Progress</div>
-    <div class="filter-chip" data-filter="done" onclick="setFilter(this)">Done</div>
-  </div>
-
-  <div id="woList">
-    <div class="empty">
-      <div class="empty-icon">🔧</div>
-      <div class="empty-title">Belum ada WO</div>
-      <div class="empty-sub">Sync untuk mengambil data dari dashboard</div>
-    </div>
-  </div>
-
-</div>
-
-<!-- ═══ WO DETAIL SHEET ═══ -->
-<div class="sheet-overlay" id="woSheet" onclick="closeSheet(event)">
-  <div class="sheet" id="sheetContent">
-    <div class="sheet-handle"></div>
-    <div class="sheet-head">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;">
-        <div class="sheet-title" id="sheet-title">Detail WO</div>
-        <button class="btn-ghost btn-sm" onclick="closeSheetDirect()">✕</button>
+    <div style="padding:14px 16px;border-bottom:1px solid var(--gray-100);">
+      <div class="ftxt-lbl"><span class="rdot"></span>Waktu Kerja</div>
+      <div class="time-grid">
+        <input class="time-inp" type="time" id="f-time-start">
+        <div class="time-sep">–</div>
+        <input class="time-inp" type="time" id="f-time-end">
       </div>
-      <div style="margin-top:8px;" id="sheet-chips"></div>
     </div>
-    <div class="sheet-body">
-      <div id="sheet-body-content"></div>
+    <div class="ftxt">
+      <div class="ftxt-lbl">Keterangan / Temuan</div>
+      <textarea id="f-notes" placeholder="Temuan, kendala, catatan tambahan..." rows="2"></textarea>
     </div>
+  </div>
+
+  <!-- PHOTO -->
+  <div class="photo-sec">
+    <div class="photo-sec-head">
+      <div>
+        <div class="photo-sec-title">📸 Foto Dokumentasi</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:2px;">Maks 4 foto · Auto compress</div>
+      </div>
+      <div class="photo-sec-count" id="photoCount">0/4</div>
+    </div>
+    <div class="photo-cta" id="photoCTA" onclick="triggerPhoto()">
+      <div class="photo-cta-ico">📷</div>
+      <div>
+        <div class="photo-cta-title">Tambah Foto</div>
+        <div class="photo-cta-sub">Kamera atau galeri foto</div>
+      </div>
+    </div>
+    <div class="photo-grid" id="photoGrid"></div>
+    <button class="add-more-btn" id="addMoreBtn" onclick="triggerPhoto()">+ Tambah Foto Lagi</button>
+    <input type="file" id="photoInput" accept="image/*" style="display:none;" multiple onchange="handlePhotos(event)">
+  </div>
+
+  <!-- SUBMIT -->
+  <div class="submit-wrap">
+    <button class="btn-submit" id="submitBtn" onclick="submitReport()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z"/></svg>
+      Kirim Laporan
+    </button>
+  </div>
+
+  <!-- MY REPORTS -->
+  <div class="sec-hdr">
+    <div class="sec-title">Laporan Saya</div>
+    <div class="sec-badge" id="rcount">0</div>
+  </div>
+  <div id="myReports"></div>
+  <div style="height:10px;"></div>
+</div>
+
+<!-- PAGE: DAFTAR WO -->
+<div class="page" id="page-wo">
+  <div class="stats-strip">
+    <div class="stat-col"><div class="stat-n open" id="st-open">—</div><div class="stat-l">OPEN</div></div>
+    <div class="stat-col"><div class="stat-n prog" id="st-prog">—</div><div class="stat-l">PROSES</div></div>
+    <div class="stat-col"><div class="stat-n done" id="st-done">—</div><div class="stat-l">SELESAI</div></div>
+  </div>
+  <div class="search-bar-wrap">
+    <div class="search-wrap">
+      <span class="search-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></span>
+      <input class="search-inp" id="wo-search" type="search" placeholder="Cari WO, mesin, PIC..." oninput="renderWOs()">
+    </div>
+  </div>
+  <div class="filter-row" id="filterRow">
+    <div class="fpill active" data-f="all" onclick="setF(this)">Semua</div>
+    <div class="fpill" data-f="open" onclick="setF(this)">🔵 Open</div>
+    <div class="fpill" data-f="assigned" onclick="setF(this)">🟣 Assigned</div>
+    <div class="fpill" data-f="progress" onclick="setF(this)">🟡 In Progress</div>
+    <div class="fpill" data-f="done" onclick="setF(this)">🟢 Done</div>
+  </div>
+  <div class="wo-body" id="woList">
+    <div class="empty"><div class="empty-ico">🔧</div><div class="empty-title">Belum ada WO</div><div class="empty-sub">Tekan Sync untuk mengambil data dari dashboard</div></div>
   </div>
 </div>
 
-<!-- ═══ LIGHTBOX ═══ -->
-<div class="lightbox" id="lightbox" onclick="closeLightbox()">
-  <button class="lightbox-close" onclick="closeLightbox()">✕</button>
-  <button class="lightbox-nav prev" onclick="lbNav(-1,event)">‹</button>
-  <img id="lbImg" src="" alt="">
-  <button class="lightbox-nav next" onclick="lbNav(1,event)">›</button>
+<!-- BOTTOM SHEET -->
+<div class="sheet-ov" id="sheet" onclick="sheetBg(event)">
+  <div class="sheet">
+    <div class="sheet-drag"></div>
+    <div class="sheet-head">
+      <div class="sheet-head-row">
+        <div class="sheet-title" id="sh-title">Detail</div>
+        <button class="sheet-close" onclick="closeSheet()">✕</button>
+      </div>
+      <div class="sheet-chips" id="sh-chips"></div>
+    </div>
+    <div class="sheet-body" id="sh-body"></div>
+  </div>
 </div>
 
-<!-- ═══ BOTTOM NAV ═══ -->
-<div class="bottom-nav">
-  <button class="nav-tab active" id="tab-form" onclick="goPage('form',this)">
-    <div class="nav-icon-wrap">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+<!-- BOTTOM NAV -->
+<div class="bnav" id="bnav" style="display:none;">
+  <button class="nb active" id="tab-form" onclick="goPage('form',this)">
+    <div class="nb-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+        <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+      </svg>
     </div>
     Laporan
   </button>
-  <button class="nav-tab" id="tab-wo" onclick="goPage('wo',this)">
-    <div class="nav-icon-wrap">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
-      <span class="nav-badge" id="nav-badge-wo" style="display:none;">0</span>
+  <button class="nb" id="tab-wo" onclick="goPage('wo',this)">
+    <div class="nb-icon" style="position:relative;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <rect x="2" y="7" width="20" height="14" rx="2"/>
+        <path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/>
+        <line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/>
+      </svg>
+      <span class="nb-badge" id="nb-badge" style="display:none;">0</span>
     </div>
     Daftar WO
   </button>
+</div>
+
+<!-- LIGHTBOX -->
+<div class="lb" id="lb" onclick="closeLB()">
+  <button class="lb-close" onclick="closeLB()">✕</button>
+  <button class="lb-nav prev" onclick="lbN(-1,event)">‹</button>
+  <img id="lbImg" src="" alt="">
+  <button class="lb-nav next" onclick="lbN(1,event)">›</button>
 </div>
 
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
 <script>
-// ════════════════════════════════════════
-// CONFIG & STATE
-// ════════════════════════════════════════
-const DEFAULT_GAS_URL = 'https://script.google.com/macros/s/AKfycbwWPB2n6dnB1Ea76lNvm3_SpWK9cwkb3gx9k8QW4YRTB5KFOcfOQF3i1r6ErjaW4Hzhfw/exec';
-let GAS_URL  = localStorage.getItem('pm_tech_gas_url') || DEFAULT_GAS_URL;
-let TECH_NAME = localStorage.getItem('pm_tech_name') || '';
+'use strict';
+const GAS_URL='https://script.google.com/macros/s/AKfycbwWPB2n6dnB1Ea76lNvm3_SpWK9cwkb3gx9k8QW4YRTB5KFOcfOQF3i1r6ErjaW4Hzhfw/exec';
+const MAX_PH=4, RKEY='pm_tech_rpts_v3', NKEY='pm_tech_name';
 
-let state = {
-  woList: [],
-  myReports: JSON.parse(localStorage.getItem('pm_tech_reports') || '[]'),
-  photos: [],      // { file, dataUrl, compressed }
-  lbImages: [],
-  lbIdx: 0,
-  filterStatus: 'all',
-};
+const SM={open:['Open','chip-blue'],assigned:['Assigned','chip-purple'],progress:['In Progress','chip-amber'],done:['Done','chip-green'],closed:['Selesai','chip-gray'],cancel:['Batal','chip-gray']};
+const PM={C:['Critical','chip-red','prio-c'],H:['High','chip-amber','prio-h'],M:['Medium','chip-blue','prio-m'],L:['Low','chip-green','prio-l']};
+const TL={corrective:'Corrective',preventive:'Preventive',emergency:'Emergency',improvement:'Improvement'};
 
-// ════════════════════════════════════════
-// INIT
-// ════════════════════════════════════════
+const st={name:'',woList:[],reports:[],photos:[],lbUrls:[],lbIdx:0,wof:'all'};
+
 function init(){
-  // Pre-fill config URL field with default/saved value
-  const cfgUrlEl = document.getElementById('cfg-url');
-  if(cfgUrlEl) cfgUrlEl.value = localStorage.getItem('pm_tech_gas_url') || DEFAULT_GAS_URL;
-
-  if(TECH_NAME){
-    // Name is set — skip config screen, go straight in
-    document.getElementById('configScreen').style.display = 'none';
-    startApp();
-  } else {
-    // Show config screen but URL is already pre-filled
-    document.getElementById('configScreen').style.display = 'flex';
-  }
+  try{st.reports=JSON.parse(localStorage.getItem(RKEY)||'[]');}catch(e){st.reports=[];}
+  st.name=localStorage.getItem(NKEY)||'';
+  if(st.name){hideLogin();startApp();}
+  else document.getElementById('loginSc').style.display='flex';
 }
 
-function saveConfig(){
-  const urlInput = document.getElementById('cfg-url').value.trim();
-  const name = document.getElementById('cfg-name').value.trim();
-  if(!name){ toast('Masukkan nama teknisi dulu', 'error'); return; }
-  GAS_URL   = urlInput || DEFAULT_GAS_URL;
-  TECH_NAME = name;
-  localStorage.setItem('pm_tech_gas_url', GAS_URL);
-  localStorage.setItem('pm_tech_name', name);
-  document.getElementById('configScreen').style.display = 'none';
-  startApp();
+function doLogin(){
+  const n=document.getElementById('cfg-name').value.trim();
+  if(!n){toast('Masukkan nama dulu','err');return;}
+  st.name=n;localStorage.setItem(NKEY,n);
+  hideLogin();startApp();
 }
-
-function startOffline(){
-  const name = document.getElementById('cfg-name').value.trim();
-  if(!name){ toast('Masukkan nama teknisi dulu', 'error'); return; }
-  TECH_NAME = name;
-  localStorage.setItem('pm_tech_name', name);
-  document.getElementById('configScreen').style.display = 'none';
-  startApp();
+function hideLogin(){
+  document.getElementById('loginSc').style.display='none';
+  document.getElementById('appHdr').style.display='flex';
+  document.getElementById('bnav').style.display='grid';
 }
-
 function startApp(){
-  document.getElementById('headerSub').textContent = `👤 ${TECH_NAME}${GAS_URL?' · ☁ Terhubung':' · 💾 Offline'}`;
-  document.getElementById('f-tech').value = TECH_NAME;
-  document.getElementById('f-date').value = new Date().toISOString().slice(0,10);
-
-  if(document.getElementById('form-user-alert')){
-    document.getElementById('form-user-alert').style.display = 'flex';
-    document.getElementById('form-user-text').textContent = `Login sebagai: ${TECH_NAME}`;
-  }
-
-  renderPhotoGrid();
-  renderMyReports();
-  if(GAS_URL) syncData();
-  else renderWOList();
+  const ini=st.name.split(' ').map(s=>s[0]).slice(0,2).join('').toUpperCase();
+  document.getElementById('hdrAva').textContent=ini;
+  document.getElementById('hdrName').textContent=st.name;
+  document.getElementById('f-tech').value=st.name;
+  document.getElementById('f-date').value=todayISO();
+  renderPhotoUI();renderReports();renderWOStats();
+  syncData();
 }
 
-// ════════════════════════════════════════
-// NAV
-// ════════════════════════════════════════
-function goPage(id, btn){
+const todayISO=()=>new Date().toISOString().slice(0,10);
+const nowHM=()=>{const n=new Date();return pad2(n.getHours())+':'+pad2(n.getMinutes());};
+const pad2=n=>String(n).padStart(2,'0');
+
+function goPage(id,btn){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('active'));
   document.getElementById('page-'+id).classList.add('active');
-  if(btn) btn.classList.add('active');
+  if(btn)btn.classList.add('active');
 }
 
-// ════════════════════════════════════════
-// SYNC FROM GAS
-// ════════════════════════════════════════
 async function syncData(){
-  if(!GAS_URL){ setSyncUI('offline'); return; }
   setSyncUI('loading');
-  try {
-    const res  = await fetch(GAS_URL, {cache:'no-cache'});
-    const data = await res.json();
-    if(data && data.wo){
-      state.woList = data.wo || [];
-    } else if(data && !data.error){
-      // Field mapping from PM dashboard payload
-      state.woList = data.wo || data.woList || [];
-    }
-    // Populate WO select in form
-    populateWOSelect();
-    renderWOList();
-    renderWOStats();
-    setSyncUI('ok');
-    toast('✓ Data diperbarui', 'success');
-  } catch(e){
-    console.error(e);
-    setSyncUI('err');
-    toast('Gagal sync — cek koneksi', 'error');
-  }
+  try{
+    const r=await fetch(GAS_URL,{cache:'no-cache'});
+    const d=await r.json();
+    st.woList=d.wo||d.woList||[];
+    fillWOSelect();renderWOs();renderWOStats();setSyncUI('ok');
+  }catch(e){setSyncUI('err');toast('Gagal sync','err');}
 }
-
 function setSyncUI(s){
-  const el = document.getElementById('syncBtn');
-  const map = {
-    ok: ['☁️ Synced','sync-ok'],
-    loading: ['⏳ Sync...','sync-loading'],
-    err: ['⚠ Error','sync-err'],
-    offline: ['💾 Offline','']
-  };
-  const [txt, cls] = map[s]||['⟳ Sync',''];
-  el.textContent = txt;
-  el.className = 'header-sync ' + cls;
+  const d=document.getElementById('sDot'),t=document.getElementById('sTxt');
+  d.className='s-dot '+s;
+  t.textContent=s==='ok'?'Synced':s==='loading'?'Sync...':s==='err'?'Error':'Offline';
+}
+function fillWOSelect(){
+  const sel=document.getElementById('f-plan'),cur=sel.value;
+  sel.innerHTML='<option value="">-- Pilih WO (opsional) --</option>';
+  st.woList.filter(w=>!['done','closed','cancel'].includes(w.status)).forEach(w=>{
+    sel.innerHTML+=`<option value="${w.no||w.id}">${w.no||''}${w.machine?' ['+w.machine+']':''} ${(w.desc||'').slice(0,35)}</option>`;
+  });
+  sel.value=cur;
 }
 
-function populateWOSelect(){
-  const sel = document.getElementById('f-plan');
-  const cur = sel.value;
-  sel.innerHTML = '<option value="">-- Pilih WO (opsional) --</option>';
-  state.woList
-    .filter(w=>w.status!=='done'&&w.status!=='closed'&&w.status!=='cancel')
-    .forEach(w=>{
-      sel.innerHTML += `<option value="${w.no||w.id}">${w.no||''} — ${w.machine||''}: ${(w.desc||'').slice(0,40)}</option>`;
-    });
-  sel.value = cur;
+/* PHOTOS */
+function renderPhotoUI(){
+  const n=st.photos.length;
+  document.getElementById('photoCount').textContent=n+'/'+MAX_PH;
+  const cta=document.getElementById('photoCTA');
+  const grid=document.getElementById('photoGrid');
+  const addBtn=document.getElementById('addMoreBtn');
+  if(n===0){cta.style.display='flex';grid.style.display='none';addBtn.style.display='none';return;}
+  cta.style.display='none';grid.style.display='grid';
+  addBtn.style.display=n<MAX_PH?'block':'none';
+  grid.innerHTML=st.photos.map((p,i)=>`
+    <div class="photo-slot" onclick="openLB(${i})">
+      <img src="${p.dataUrl}" alt="">
+      <button class="pdel" onclick="event.stopPropagation();rmPhoto(${i})">✕</button>
+    </div>`).join('')+
+    (n<MAX_PH?`<div class="photo-slot photo-slot-add" onclick="triggerPhoto()"><span class="photo-slot-add-icon">+</span></div>`:'');
 }
-
-// ════════════════════════════════════════
-// PHOTO HANDLING
-// ════════════════════════════════════════
-const MAX_PHOTOS = 4;
-
-function renderPhotoGrid(){
-  const grid = document.getElementById('photoGrid');
-  grid.innerHTML = '';
-  for(let i=0; i<MAX_PHOTOS; i++){
-    const slot = document.createElement('div');
-    slot.className = 'photo-slot' + (state.photos[i]?' filled':'') + (i>=MAX_PHOTOS?' disabled':'');
-    slot.dataset.idx = i;
-    if(state.photos[i]){
-      slot.innerHTML = `<img src="${state.photos[i].dataUrl}" alt="">
-        <button class="photo-del" onclick="removePhoto(${i},event)">✕</button>`;
-      slot.onclick = ()=>openLightboxLocal(i);
-    } else {
-      slot.innerHTML = `<div class="photo-icon">📷</div><div class="photo-txt">Foto ${i+1}</div>`;
-      slot.onclick = ()=>triggerPhoto();
-    }
-    grid.appendChild(slot);
+function triggerPhoto(){if(st.photos.length>=MAX_PH){toast('Maks 4 foto','warn');return;}document.getElementById('photoInput').click();}
+async function handlePhotos(e){
+  for(const f of Array.from(e.target.files)){
+    if(st.photos.length>=MAX_PH)break;
+    const c=await compImg(f,1400,.80);
+    st.photos.push({file:c,dataUrl:await toDataURL(c)});
   }
+  e.target.value='';renderPhotoUI();
 }
-
-function triggerPhoto(){
-  if(state.photos.length >= MAX_PHOTOS){ toast('Maks 4 foto','warn'); return; }
-  document.getElementById('photoInput').click();
-}
-
-async function handlePhotoInput(e){
-  const files = Array.from(e.target.files);
-  for(const file of files){
-    if(state.photos.length >= MAX_PHOTOS) break;
-    const compressed = await compressImage(file, 1200, 0.78);
-    const dataUrl = await toDataUrl(compressed);
-    state.photos.push({file:compressed, dataUrl, name:file.name});
-  }
-  e.target.value = '';
-  renderPhotoGrid();
-}
-
-function removePhoto(idx, e){
-  e.stopPropagation();
-  state.photos.splice(idx,1);
-  renderPhotoGrid();
-}
-
-function compressImage(file, maxPx, quality){
-  return new Promise(resolve=>{
-    const img = new Image();
-    const url = URL.createObjectURL(file);
-    img.onload = ()=>{
+function rmPhoto(i){st.photos.splice(i,1);renderPhotoUI();}
+function compImg(file,mx,q){
+  return new Promise(res=>{
+    const img=new Image(),url=URL.createObjectURL(file);
+    img.onload=()=>{
       URL.revokeObjectURL(url);
-      let {width,height} = img;
-      if(width > maxPx || height > maxPx){
-        if(width > height){ height = Math.round(height/width*maxPx); width=maxPx; }
-        else { width = Math.round(width/height*maxPx); height=maxPx; }
-      }
-      const c = document.createElement('canvas');
-      c.width=width; c.height=height;
-      c.getContext('2d').drawImage(img,0,0,width,height);
-      c.toBlob(b=>resolve(b||file),file.type||'image/jpeg',quality);
+      let{width:w,height:h}=img;
+      if(w>mx||h>mx){if(w>h){h=Math.round(h/w*mx);w=mx;}else{w=Math.round(w/h*mx);h=mx;}}
+      const c=document.createElement('canvas');c.width=w;c.height=h;
+      c.getContext('2d').drawImage(img,0,0,w,h);
+      c.toBlob(b=>res(b||file),file.type||'image/jpeg',q);
     };
-    img.onerror = ()=>resolve(file);
-    img.src = url;
+    img.onerror=()=>res(file);img.src=url;
   });
 }
+const toDataURL=b=>new Promise(r=>{const fr=new FileReader();fr.onload=e=>r(e.target.result);fr.readAsDataURL(b);});
+const toB64=b=>new Promise(r=>{const fr=new FileReader();fr.onload=e=>r(e.target.result.split(',')[1]);fr.readAsDataURL(b);});
 
-function toDataUrl(blob){
-  return new Promise(r=>{ const reader=new FileReader(); reader.onload=e=>r(e.target.result); reader.readAsDataURL(blob); });
-}
-
-function toBase64(blob){
-  return new Promise(r=>{ const reader=new FileReader(); reader.onload=e=>r(e.target.result.split(',')[1]); reader.readAsDataURL(blob); });
-}
-
-// ════════════════════════════════════════
-// SUBMIT REPORT
-// ════════════════════════════════════════
+/* SUBMIT */
 async function submitReport(){
-  const date  = document.getElementById('f-date').value;
-  const tech  = document.getElementById('f-tech').value.trim();
-  const area  = document.getElementById('f-area').value;
-  const work  = document.getElementById('f-work').value.trim();
-  const tStart= document.getElementById('f-time-start').value;
-  const tEnd  = document.getElementById('f-time-end').value;
-
-  if(!date||!tech||!area||!work||!tStart||!tEnd){
-    toast('Lengkapi field wajib (*)','error'); return;
+  const date=document.getElementById('f-date').value,
+        area=document.getElementById('f-area').value,
+        work=document.getElementById('f-work').value.trim(),
+        ts=document.getElementById('f-time-start').value,
+        te=document.getElementById('f-time-end').value;
+  if(!date||!area||!work||!ts||!te){toast('Lengkapi field wajib (*)','err');return;}
+  const btn=document.getElementById('submitBtn');
+  btn.disabled=true;btn.innerHTML='<span>⏳ Mengirim...</span>';
+  const photos=[];
+  for(const p of st.photos){
+    try{
+      const b64=await toB64(p.file);
+      const r=await fetch(GAS_URL,{method:'POST',headers:{'Content-Type':'text/plain'},
+        body:JSON.stringify({action:'uploadPhoto',photoData:b64,mimeType:p.file.type||'image/jpeg',
+          fileName:`laporan_${st.name.replace(/\s/g,'_')}_${date}_${Date.now()}.jpg`,submitter:st.name})});
+      const d=await r.json();
+      photos.push({dataUrl:p.dataUrl,url:d.ok?d.viewUrl:'',thumb:d.ok?d.thumbUrl:''});
+    }catch(e){photos.push({dataUrl:p.dataUrl,url:'',thumb:''});}
   }
-
-  const btn = document.getElementById('submitBtn');
-  btn.disabled = true;
-  btn.innerHTML = '<span>⏳ Mengirim...</span>';
-
-  try {
-    // Upload photos to GAS if connected
-    const photoUrls = [];
-    if(GAS_URL && state.photos.length){
-      for(const p of state.photos){
-        try {
-          const b64 = await toBase64(p.file);
-          const res = await fetch(GAS_URL, {
-            method:'POST',
-            headers:{'Content-Type':'text/plain'},
-            body: JSON.stringify({
-              action:'uploadPhoto',
-              photoData: b64,
-              mimeType: p.file.type||'image/jpeg',
-              fileName: `laporan_${tech}_${date}_${Date.now()}.jpg`,
-              submitter: tech
-            })
-          });
-          const r = await res.json();
-          if(r.ok) photoUrls.push({url:r.viewUrl, thumb:r.thumbUrl, directUrl:r.directUrl});
-        } catch(e){ /* skip failed photo */ }
-      }
-    }
-
-    const report = {
-      id: Date.now().toString(36) + Math.random().toString(36).slice(2,5),
-      date, tech, area,
-      plan: document.getElementById('f-plan').value,
-      work,
-      timeStart: tStart,
-      timeEnd: tEnd,
-      notes: document.getElementById('f-notes').value,
-      photos: state.photos.length ? state.photos.map((p,i)=>({
-        dataUrl: p.dataUrl,
-        url: photoUrls[i]?.url||'',
-        thumb: photoUrls[i]?.thumb||'',
-      })) : [],
-      createdAt: new Date().toISOString(),
-      synced: !!GAS_URL,
-    };
-
-    // Save report locally
-    state.myReports.unshift(report);
-    if(state.myReports.length > 50) state.myReports = state.myReports.slice(0,50);
-    localStorage.setItem('pm_tech_reports', JSON.stringify(state.myReports));
-
-    // If GAS connected, also save as BD/activity log (optional ping)
-    // For now we just save locally and show success
-
-    toast('✓ Laporan berhasil dikirim!', 'success');
-    resetForm();
-    renderMyReports();
-
-  } catch(err){
-    toast('Gagal kirim: '+err.message,'error');
-  } finally {
-    btn.disabled = false;
-    btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z"/></svg><span>Kirim Laporan</span>`;
-  }
+  const rep={id:Date.now().toString(36)+Math.random().toString(36).slice(2,5),
+    date,tech:st.name,area,
+    plan:document.getElementById('f-plan').value,
+    work,timeStart:ts,timeEnd:te,
+    notes:document.getElementById('f-notes').value,
+    photos,createdAt:new Date().toISOString()};
+  st.reports.unshift(rep);
+  if(st.reports.length>60)st.reports=st.reports.slice(0,60);
+  localStorage.setItem(RKEY,JSON.stringify(st.reports));
+  toast('✓ Laporan berhasil dikirim!','ok');
+  resetForm();renderReports();
+  btn.disabled=false;
+  btn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:20px;height:20px"><path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z"/></svg>Kirim Laporan';
 }
-
 function resetForm(){
-  document.getElementById('f-date').value = new Date().toISOString().slice(0,10);
-  document.getElementById('f-area').value = '';
-  document.getElementById('f-plan').value = '';
-  document.getElementById('f-work').value = '';
-  document.getElementById('f-time-start').value = '';
-  document.getElementById('f-time-end').value = '';
-  document.getElementById('f-notes').value = '';
-  state.photos = [];
-  renderPhotoGrid();
-  window.scrollTo({top:0, behavior:'smooth'});
+  document.getElementById('f-date').value=todayISO();
+  ['f-area','f-plan','f-work','f-time-start','f-time-end','f-notes'].forEach(id=>document.getElementById(id).value='');
+  st.photos=[];renderPhotoUI();window.scrollTo({top:0,behavior:'smooth'});
 }
 
-// ════════════════════════════════════════
-// MY REPORTS
-// ════════════════════════════════════════
-function renderMyReports(){
-  const el = document.getElementById('myReports');
-  const list = state.myReports.slice(0,10);
-  if(!list.length){
-    el.innerHTML = `<div class="empty" style="padding:24px 20px;">
-      <div class="empty-icon" style="font-size:28px;">📋</div>
-      <div class="empty-sub">Belum ada laporan yang dikirim</div>
-    </div>`;
-    return;
+/* REPORTS */
+function renderReports(){
+  const el=document.getElementById('myReports');
+  document.getElementById('rcount').textContent=st.reports.length;
+  if(!st.reports.length){
+    el.innerHTML='<div class="empty" style="padding:32px 20px;"><div class="empty-ico" style="font-size:36px;">📋</div><div class="empty-sub">Laporan yang kamu kirim akan muncul di sini</div></div>';return;
   }
-  el.innerHTML = list.map(r=>`
-    <div class="report-card" onclick="openReportDetail('${r.id}')">
-      <div class="report-date">${fmtDate(r.date)} · ${r.timeStart}–${r.timeEnd}</div>
-      <div class="report-title">${r.work.slice(0,60)}${r.work.length>60?'...':''}</div>
-      <div class="report-meta">📍 ${r.area}${r.plan?' · 🔧 '+r.plan:''}</div>
-      ${r.photos?.length?`<div style="display:flex;gap:4px;margin-top:8px;">
-        ${r.photos.slice(0,4).map(p=>`<img src="${p.thumb||p.dataUrl}" class="wo-photo-thumb" onclick="event.stopPropagation();openLightboxUrls([${r.photos.map(x=>`'${x.dataUrl}'`).join(',')}],0)">`).join('')}
-      </div>`:''}
+  el.innerHTML=st.reports.slice(0,20).map(r=>`
+    <div class="rcard" onclick="openReportSheet('${r.id}')">
+      <div class="rcard-top">
+        <div class="rcard-date">📅 ${fmtDate(r.date)} &nbsp;·&nbsp; ⏱ ${r.timeStart}–${r.timeEnd}</div>
+        <div class="rcard-title">${r.work.slice(0,70)}${r.work.length>70?'...':''}</div>
+      </div>
+      <div class="rcard-bot">
+        <div class="rcard-chips">
+          <span class="chip chip-blue">📍 ${r.area}</span>
+          ${r.plan?`<span class="chip chip-gray">🔧 ${r.plan}</span>`:''}
+        </div>
+        ${r.photos?.length?`<div class="rcard-photos">${r.photos.slice(0,4).map((p,i)=>`<img src="${p.thumb||p.dataUrl}" class="rcard-thumb" onclick="event.stopPropagation();openLBUrls(${JSON.stringify(r.photos.map(x=>x.dataUrl||x.url))},${i})">`).join('')}</div>`:''}
+      </div>
     </div>`).join('');
 }
-
-function openReportDetail(id){
-  const r = state.myReports.find(x=>x.id===id);
-  if(!r) return;
-  const imgs = (r.photos||[]).map(p=>p.dataUrl||p.url).filter(Boolean);
-
-  document.getElementById('sheet-title').textContent = r.work.slice(0,50);
-  document.getElementById('sheet-chips').innerHTML = `
-    <span class="wo-chip chip-cyan">${r.area}</span>
-    <span class="wo-chip chip-gray">${r.date}</span>
-    <span class="wo-chip chip-blue">${r.timeStart}–${r.timeEnd}</span>`;
-
-  document.getElementById('sheet-body-content').innerHTML = `
-    ${field('Teknisi', r.tech)}
-    ${field('Area / Unit', r.area)}
-    ${r.plan?field('WO / Plan', r.plan):''}
-    ${field('Pekerjaan', r.work)}
-    ${field('Waktu', r.timeStart + ' — ' + r.timeEnd)}
-    ${r.notes?field('Keterangan', r.notes):''}
-    ${imgs.length?`<div class="sheet-field">
-      <div class="sheet-field-label">Foto Dokumentasi</div>
-      <div class="sheet-photos">
-        ${imgs.map((url,i)=>`<img src="${url}" class="sheet-photo" onclick="openLightboxUrls([${imgs.map(u=>`'${u}'`).join(',')}],${i})">`).join('')}
-      </div>
-    </div>`:''}`;
-
-  document.getElementById('woSheet').classList.add('open');
+function openReportSheet(id){
+  const r=st.reports.find(x=>x.id===id);if(!r)return;
+  const imgs=(r.photos||[]).map(p=>p.dataUrl||p.url).filter(Boolean);
+  document.getElementById('sh-title').textContent=r.work.slice(0,60);
+  document.getElementById('sh-chips').innerHTML=
+    `<span class="chip chip-blue">📍 ${r.area}</span><span class="chip chip-gray">📅 ${r.date}</span><span class="chip chip-green">⏱ ${r.timeStart}–${r.timeEnd}</span>`;
+  document.getElementById('sh-body').innerHTML=
+    drow('Teknisi',r.tech)+drow('Area / Unit',r.area)+(r.plan?drow('WO / Plan',r.plan):'')+
+    drow('Uraian Pekerjaan',r.work)+drow('Waktu',r.timeStart+' — '+r.timeEnd)+
+    (r.notes?drow('Keterangan',r.notes):'')+
+    (imgs.length?`<div class="drow"><div class="drow-lbl">📸 Foto (${imgs.length})</div>
+    <div class="sheet-photos">${imgs.map((u,i)=>`<img src="${u}" class="sheet-photo" onclick="openLBUrls(${JSON.stringify(imgs)},${i})">`).join('')}</div></div>`:'');
+  openSheet();
 }
 
-// ════════════════════════════════════════
-// WO LIST
-// ════════════════════════════════════════
-let _woFilter = 'all';
-
-function setFilter(el){
-  _woFilter = el.dataset.filter;
-  document.querySelectorAll('#wo-filters .filter-chip').forEach(c=>c.classList.remove('active'));
-  el.classList.add('active');
-  renderWOList();
+/* WO LIST */
+function setF(el){
+  st.wof=el.dataset.f;
+  document.querySelectorAll('#filterRow .fpill').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');renderWOs();
 }
-
-const STATUS_MAP = {
-  open:     ['Open',     'chip-blue'],
-  assigned: ['Assigned', 'chip-purple'],
-  progress: ['In Progress','chip-amber'],
-  done:     ['Done',     'chip-green'],
-  closed:   ['Closed',   'chip-gray'],
-  cancel:   ['Cancel',   'chip-gray'],
-};
-const PRIO_MAP = {
-  C:['Critical','chip-red','prio-c'],
-  H:['High','chip-amber','prio-h'],
-  M:['Medium','chip-blue','prio-m'],
-  L:['Low','chip-green','prio-l'],
-};
-
-function renderWOList(){
-  const el     = document.getElementById('woList');
-  const search = (document.getElementById('wo-search')?.value||'').toLowerCase();
-  let list     = [...state.woList];
-
-  if(_woFilter !== 'all') list = list.filter(w=>w.status===_woFilter);
-  if(search) list = list.filter(w=>
-    (w.no||'').toLowerCase().includes(search)||
-    (w.machine||'').toLowerCase().includes(search)||
-    (w.desc||'').toLowerCase().includes(search)||
-    (w.pic||'').toLowerCase().includes(search)
-  );
-
-  // Sort: prio C > H > M > L, then by date desc
-  const prioOrder = {C:0,H:1,M:2,L:3};
-  list.sort((a,b)=>(prioOrder[a.priority]||2)-(prioOrder[b.priority]||2));
-
-  renderWOStats();
-
+function renderWOs(){
+  const el=document.getElementById('woList');
+  const q=(document.getElementById('wo-search')?.value||'').toLowerCase();
+  let list=[...st.woList];
+  if(st.wof!=='all')list=list.filter(w=>w.status===st.wof);
+  if(q)list=list.filter(w=>(w.no||'').toLowerCase().includes(q)||(w.machine||'').toLowerCase().includes(q)||(w.desc||'').toLowerCase().includes(q)||(w.pic||'').toLowerCase().includes(q));
+  const po={C:0,H:1,M:2,L:3};list.sort((a,b)=>(po[a.priority]||2)-(po[b.priority]||2));
   if(!list.length){
-    el.innerHTML = `<div class="empty">
-      <div class="empty-icon">🔍</div>
-      <div class="empty-title">${search?'Tidak ditemukan':'Tidak ada WO'}</div>
-      <div class="empty-sub">${search?'Coba kata kunci lain':'Sync untuk mengambil data terbaru'}</div>
-    </div>`;
-    return;
+    el.innerHTML=`<div class="empty"><div class="empty-ico">${q?'🔍':'🔧'}</div><div class="empty-title">${q?'Tidak ditemukan':'Belum ada WO'}</div><div class="empty-sub">${q?'Coba kata kunci lain':'Tekan Sync untuk memperbarui'}</div></div>`;return;
   }
-
-  el.innerHTML = list.map(w=>{
-    const [sLabel, sCls] = STATUS_MAP[w.status]||['—','chip-gray'];
-    const [pLabel, pCls, cardCls] = PRIO_MAP[w.priority]||['—','chip-gray',''];
-    const initials = (w.pic||'?').split(' ').map(s=>s[0]).slice(0,2).join('').toUpperCase();
-
-    // photos from linked reports
-    const linkedReports = state.myReports.filter(r=>r.plan===w.no);
-    const repPhotos = linkedReports.flatMap(r=>(r.photos||[]).map(p=>p.dataUrl||p.thumb||p.url)).filter(Boolean).slice(0,3);
-
-    return `<div class="wo-card ${cardCls}" onclick="openWOSheet('${w.id||w.no}')">
-      <div class="wo-title">${w.desc||'(tanpa deskripsi)'}</div>
-      <div class="wo-meta">
-        <span class="wo-chip ${sCls}">${sLabel}</span>
-        ${w.priority?`<span class="wo-chip ${pCls}">${pLabel}</span>`:''}
-        ${w.no?`<span class="wo-chip chip-gray" style="font-size:8px;">${w.no}</span>`:''}
-        ${w.machine?`<span class="wo-chip chip-cyan">⚙ ${w.machine}</span>`:''}
-      </div>
-      ${w.desc?`<div class="wo-desc">${w.desc.slice(0,100)}${w.desc.length>100?'...':''}</div>`:''}
-      <div class="wo-footer">
-        <div class="wo-pic">
-          ${w.pic?`<div class="wo-avatar">${initials}</div><span>${w.pic}</span>`:'<span style="color:var(--text3)">Belum assigned</span>'}
+  el.innerHTML=list.map(w=>{
+    const[sL,sC]=SM[w.status]||['—','chip-gray'];
+    const[pL,pC,stripe]=PM[w.priority]||['—','chip-gray',''];
+    const ini=(w.pic||'?').split(' ').map(s=>s[0]).slice(0,2).join('').toUpperCase();
+    const rph=st.reports.filter(r=>r.plan===w.no).flatMap(r=>(r.photos||[]).map(p=>p.dataUrl||p.thumb)).filter(Boolean).slice(0,3);
+    return`<div class="wo-card" onclick="openWOSheet('${w.id||w.no}')">
+      <div class="wo-stripe ${stripe}"></div>
+      <div class="wo-inner">
+        <div class="wo-title">${w.desc||'(tanpa deskripsi)'}</div>
+        <div class="wo-chips">
+          <span class="chip ${sC}">${sL}</span>
+          ${w.priority?`<span class="chip ${pC}">${pL}</span>`:''}
+          ${w.no?`<span class="chip chip-gray" style="font-size:9px;">${w.no}</span>`:''}
+          ${w.machine?`<span class="chip chip-blue">⚙ ${w.machine}</span>`:''}
         </div>
-        ${repPhotos.length?`<div class="wo-photos-preview">
-          ${repPhotos.map((url,i)=>`<img src="${url}" class="wo-photo-thumb" onclick="event.stopPropagation();openLightboxUrls([${repPhotos.map(u=>`'${u}'`).join(',')}],${i})">`).join('')}
-        </div>`:''}
-      </div>
-      ${w.target?`<div style="margin-top:8px;font-family:var(--mono);font-size:9px;color:var(--text3);">📅 Target: ${fmtDate(w.target)}</div>`:''}
-    </div>`;
+        <div class="wo-foot">
+          <div class="wo-pic">${w.pic?`<div class="wo-ava">${ini}</div><span class="wo-picname">${w.pic}</span>`:`<span class="wo-picname" style="color:var(--gray-400)">Belum assigned</span>`}</div>
+          ${w.target?`<span class="wo-target">📅 ${fmtDate(w.target)}</span>`:''}
+        </div>
+        ${rph.length?`<div class="wo-mini-photos">${rph.map((u,i)=>`<img src="${u}" class="wo-mini-thumb" onclick="event.stopPropagation();openLBUrls(${JSON.stringify(rph)},${i})">`).join('')}</div>`:''}
+      </div></div>`;
   }).join('');
 }
-
 function renderWOStats(){
-  const wo = state.woList;
-  document.getElementById('st-open').textContent  = wo.filter(w=>w.status==='open').length;
-  document.getElementById('st-prog').textContent  = wo.filter(w=>w.status==='progress'||w.status==='assigned').length;
-  document.getElementById('st-done').textContent  = wo.filter(w=>w.status==='done'||w.status==='closed').length;
-
-  const openCount = wo.filter(w=>w.status==='open'||w.status==='assigned'||w.status==='progress').length;
-  const badge = document.getElementById('nav-badge-wo');
-  if(openCount>0){ badge.style.display='flex'; badge.textContent=openCount>9?'9+':openCount; }
-  else { badge.style.display='none'; }
+  const w=st.woList;
+  document.getElementById('st-open').textContent=w.filter(x=>x.status==='open').length;
+  document.getElementById('st-prog').textContent=w.filter(x=>x.status==='progress'||x.status==='assigned').length;
+  document.getElementById('st-done').textContent=w.filter(x=>x.status==='done'||x.status==='closed').length;
+  const ac=w.filter(x=>['open','assigned','progress'].includes(x.status)).length;
+  const b=document.getElementById('nb-badge');
+  b.style.display=ac>0?'flex':'none';b.textContent=ac>9?'9+':ac;
 }
-
-// ════════════════════════════════════════
-// WO DETAIL SHEET
-// ════════════════════════════════════════
 function openWOSheet(id){
-  const w = state.woList.find(x=>(x.id||x.no)===id||x.no===id);
-  if(!w) return;
-
-  const [sLabel, sCls] = STATUS_MAP[w.status]||['—','chip-gray'];
-  const [pLabel, pCls] = PRIO_MAP[w.priority]||['—','chip-gray'];
-
-  document.getElementById('sheet-title').textContent = w.desc||'Work Order';
-  document.getElementById('sheet-chips').innerHTML = `
-    <span class="wo-chip ${sCls}">${sLabel}</span>
-    ${w.priority?`<span class="wo-chip ${pCls}">${pLabel}</span>`:''}
-    ${w.no?`<span class="wo-chip chip-gray">${w.no}</span>`:''}
-    ${w.machine?`<span class="wo-chip chip-cyan">⚙ ${w.machine}</span>`:''}`;
-
-  // Get photos from linked reports
-  const linked = state.myReports.filter(r=>r.plan===w.no);
-  const allPhotos = linked.flatMap(r=>(r.photos||[]).map(p=>({src:p.dataUrl||p.url, thumb:p.thumb||p.dataUrl||p.url})));
-
-  document.getElementById('sheet-body-content').innerHTML = `
-    ${field('Nama Pekerjaan', w.desc||'—')}
-    ${field('Mesin / Area', w.machine||'—')}
-    ${field('PIC / Teknisi', w.pic||'Belum assigned')}
-    ${field('Jenis', w.type ? (w.type.charAt(0).toUpperCase()+w.type.slice(1)) : '—')}
-    ${w.date||w.createdAt?field('Tanggal Request', fmtDate((w.date||w.createdAt||'').slice(0,10))):''}
-    ${w.target?field('Target Selesai', fmtDate(w.target)):''}
-    ${w.estDuration?field('Estimasi Durasi', w.estDuration+' jam'):''}
-    ${w.action?field('Tindakan', w.action):''}
-    ${w.rootcause?field('Root Cause', w.rootcause):''}
-    ${w.spareUsed?field('Spare Part Digunakan', w.spareUsed):''}
-    ${w.notes||w.action?'':field('Keterangan', w.notes||'—')}
-    ${allPhotos.length?`<div class="sheet-field">
-      <div class="sheet-field-label">📸 Foto dari Laporan (${allPhotos.length})</div>
-      <div class="sheet-photos">
-        ${allPhotos.map((p,i)=>`<img src="${p.thumb}" class="sheet-photo"
-          onclick="openLightboxUrls([${allPhotos.map(x=>`'${x.src}'`).join(',')}],${i})">`).join('')}
-      </div>
-    </div>`:`<div class="sheet-field">
-      <div class="sheet-field-label">Foto</div>
-      <div style="color:var(--text3);font-size:12px;">Belum ada foto laporan untuk WO ini</div>
-    </div>`}
-    <div style="height:4px;"></div>
-    <button class="btn-primary" onclick="prefillFormFromWO('${w.no||w.id}');closeSheetDirect();goPage('form',document.getElementById('tab-form'))">
-      ✍️ Buat Laporan untuk WO ini
-    </button>`;
-
-  document.getElementById('woSheet').classList.add('open');
+  const w=st.woList.find(x=>(x.id||x.no)===id||x.no===id);if(!w)return;
+  const[sL,sC]=SM[w.status]||['—','chip-gray'];
+  const[pL,pC]=PM[w.priority]||['—','chip-gray'];
+  const linked=st.reports.filter(r=>r.plan===w.no);
+  const photos=linked.flatMap(r=>(r.photos||[]).map(p=>({src:p.dataUrl||p.url,thumb:p.thumb||p.dataUrl||p.url}))).filter(p=>p.src);
+  document.getElementById('sh-title').textContent=w.desc||'Work Order';
+  document.getElementById('sh-chips').innerHTML=
+    `<span class="chip ${sC}">${sL}</span>${w.priority?`<span class="chip ${pC}">${pL}</span>`:''}${w.no?`<span class="chip chip-gray">${w.no}</span>`:''}${w.machine?`<span class="chip chip-blue">⚙ ${w.machine}</span>`:''}`;
+  document.getElementById('sh-body').innerHTML=
+    drow('Nama Pekerjaan',w.desc||'—')+drow('Mesin / Area',w.machine||'—')+drow('PIC / Teknisi',w.pic||'Belum assigned')+
+    (w.type?drow('Jenis',TL[w.type]||w.type):'')+
+    (w.date||w.createdAt?drow('Tanggal Request',fmtDate((w.date||w.createdAt||'').slice(0,10))):'')+
+    (w.target?drow('Target Selesai',fmtDate(w.target)):'')+
+    (w.estDuration?drow('Estimasi Durasi',w.estDuration+' jam'):'')+
+    (w.action?drow('Tindakan',w.action):'')+
+    (w.spareUsed?drow('Spare Part',w.spareUsed):'')+
+    (photos.length?`<div class="drow"><div class="drow-lbl">📸 Foto Laporan (${photos.length})</div>
+    <div class="sheet-photos">${photos.map((p,i)=>`<img src="${p.thumb}" class="sheet-photo" onclick="openLBUrls(${JSON.stringify(photos.map(x=>x.src))},${i})">`).join('')}</div></div>`:
+    `<div class="drow"><div class="drow-lbl">Foto</div><div style="color:var(--gray-400);font-size:13px;">Belum ada foto laporan</div></div>`)+
+    `<div style="height:6px;"></div>
+    <button class="btn-action" onclick="prefill('${w.no||w.id}');closeSheet();goPage('form',document.getElementById('tab-form'))">✍️ Buat Laporan untuk WO ini</button>`;
+  openSheet();
+}
+function prefill(woNo){
+  const w=st.woList.find(x=>x.no===woNo||x.id===woNo);if(!w)return;
+  document.getElementById('f-plan').value=woNo;
+  if(w.desc)document.getElementById('f-work').value=w.desc;
+  document.getElementById('f-date').value=todayISO();
+  document.getElementById('f-time-start').value=nowHM();
 }
 
-function prefillFormFromWO(woNo){
-  const w = state.woList.find(x=>x.no===woNo||x.id===woNo);
-  if(!w) return;
-  document.getElementById('f-plan').value = woNo;
-  if(w.machine){
-    // Try match area
-    const areaEl = document.getElementById('f-area');
-    const opts = [...areaEl.options].map(o=>o.value);
-    const match = opts.find(o=>o.toLowerCase().includes(w.machine.toLowerCase().slice(0,3)));
-    if(match) areaEl.value = match;
-  }
-  if(w.desc) document.getElementById('f-work').value = w.desc;
-  document.getElementById('f-date').value = new Date().toISOString().slice(0,10);
-  // Set current time
-  const now = new Date();
-  document.getElementById('f-time-start').value = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
-}
+/* SHEET */
+const openSheet=()=>document.getElementById('sheet').classList.add('open');
+const closeSheet=()=>document.getElementById('sheet').classList.remove('open');
+function sheetBg(e){if(e.target.id==='sheet')closeSheet();}
+const drow=(l,v)=>`<div class="drow"><div class="drow-lbl">${l}</div><div class="drow-val">${v||'—'}</div></div>`;
 
-function field(label, val){
-  return `<div class="sheet-field">
-    <div class="sheet-field-label">${label}</div>
-    <div class="sheet-field-val">${val||'—'}</div>
-  </div>`;
-}
+/* LIGHTBOX */
+function openLB(i){openLBUrls(st.photos.map(p=>p.dataUrl),i);}
+function openLBUrls(urls,i){st.lbUrls=urls;st.lbIdx=i;document.getElementById('lbImg').src=urls[i];document.getElementById('lb').classList.add('open');}
+function closeLB(){document.getElementById('lb').classList.remove('open');}
+function lbN(d,e){e.stopPropagation();st.lbIdx=(st.lbIdx+d+st.lbUrls.length)%st.lbUrls.length;document.getElementById('lbImg').src=st.lbUrls[st.lbIdx];}
+let _tx=0;
+document.getElementById('lb').addEventListener('touchstart',e=>{_tx=e.changedTouches[0].screenX;},{passive:true});
+document.getElementById('lb').addEventListener('touchend',e=>{const dx=e.changedTouches[0].screenX-_tx;if(Math.abs(dx)>40)lbN(dx<0?1:-1,{stopPropagation:()=>{}});});
 
-function closeSheet(e){
-  if(e.target.id==='woSheet') closeSheetDirect();
-}
-function closeSheetDirect(){
-  document.getElementById('woSheet').classList.remove('open');
-}
+/* TOAST */
+function toast(m,t='ok'){const el=document.getElementById('toast');el.textContent=m;el.className='toast show '+t;setTimeout(()=>el.className='toast',2600);}
 
-// ════════════════════════════════════════
-// LIGHTBOX
-// ════════════════════════════════════════
-function openLightboxLocal(idx){
-  openLightboxUrls(state.photos.map(p=>p.dataUrl), idx);
-}
+/* HELPERS */
+const fmtDate=d=>{if(!d)return'—';try{return new Date(d+'T00:00:00').toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'});}catch(e){return d;}};
 
-function openLightboxUrls(urls, idx){
-  state.lbImages = urls;
-  state.lbIdx    = idx;
-  document.getElementById('lbImg').src = urls[idx];
-  document.getElementById('lightbox').classList.add('open');
-}
-
-function closeLightbox(){
-  document.getElementById('lightbox').classList.remove('open');
-}
-
-function lbNav(dir, e){
-  e.stopPropagation();
-  state.lbIdx = (state.lbIdx + dir + state.lbImages.length) % state.lbImages.length;
-  document.getElementById('lbImg').src = state.lbImages[state.lbIdx];
-}
-
-// swipe support
-let _touchStartX = 0;
-document.getElementById('lightbox').addEventListener('touchstart', e=>{ _touchStartX=e.changedTouches[0].screenX; }, {passive:true});
-document.getElementById('lightbox').addEventListener('touchend', e=>{
-  const dx = e.changedTouches[0].screenX - _touchStartX;
-  if(Math.abs(dx)>40) lbNav(dx<0?1:-1, {stopPropagation:()=>{}});
-});
-
-// ════════════════════════════════════════
-// TOAST
-// ════════════════════════════════════════
-function toast(msg, type='success'){
-  const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.className = 'toast show ' + type;
-  setTimeout(()=>el.className='toast', 2800);
-}
-
-// ════════════════════════════════════════
-// HELPERS
-// ════════════════════════════════════════
-function fmtDate(d){
-  if(!d) return '—';
-  try{ return new Date(d+'T00:00:00').toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'}); }
-  catch(e){ return d; }
-}
-
-// ════════════════════════════════════════
-// START
-// ════════════════════════════════════════
 init();
 </script>
 </body>
