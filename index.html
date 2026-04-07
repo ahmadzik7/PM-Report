@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>CI Form — Laporan & Request Project</title>
+<meta name="theme-color" content="#0F172A">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;}
+  :root{
+    --bg:#0F172A;--surface:#1E293B;--surface2:#263244;--border:#334155;
+    --text:#E2E8F0;--text-muted:#64748B;--text-dim:#94A3B8;
+    --accent:#F59E0B;--teal:#14B8A6;--success:#22C55E;--danger:#EF4444;
+    --radius:8px;--mono:'Courier New',monospace;
+  }
+  body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;padding:0 0 80px;}
+
+  .top-bar{background:var(--surface);border-bottom:2px solid var(--accent);padding:14px 16px;
+    display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100;}
+  .logo{width:36px;height:36px;background:var(--accent);border-radius:6px;display:flex;align-items:center;
+    justify-content:center;font-weight:900;font-size:14px;color:#0F172A;flex-shrink:0;}
+  .top-bar h1{font-size:14px;font-weight:700;letter-spacing:0.5px;}
+  .top-bar p{font-size:10px;color:var(--text-muted);margin-top:1px;}
+
+  .tabs{display:flex;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:64px;z-index:99;}
+  .tab-btn{flex:1;padding:12px 8px;text-align:center;font-size:11px;font-weight:600;color:var(--text-muted);
+    border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;letter-spacing:0.5px;transition:all .2s;}
+  .tab-btn.active{color:var(--accent);border-bottom-color:var(--accent);}
+
+  .submitter-banner{background:rgba(245,158,11,0.07);border:1.5px solid rgba(245,158,11,0.4);
+    border-radius:var(--radius);padding:14px 16px;margin-bottom:20px;}
+  .submitter-banner .banner-label{color:var(--accent);font-size:10px;font-weight:700;
+    letter-spacing:1.2px;text-transform:uppercase;display:block;margin-bottom:6px;}
+  .submitter-banner input{width:100%;background:var(--surface);border:1px solid var(--border);
+    color:var(--text);padding:10px 12px;border-radius:var(--radius);font-size:14px;font-weight:600;
+    outline:none;transition:border-color .2s;}
+  .submitter-banner input:focus{border-color:var(--accent);}
+  .submitter-banner small{display:block;margin-top:5px;font-size:10px;color:var(--text-muted);}
+
+  .form-wrap{max-width:540px;margin:0 auto;padding:16px;}
+  .section-label{font-size:9px;font-weight:700;letter-spacing:1.5px;color:var(--accent);
+    text-transform:uppercase;margin:20px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--border);}
+  .section-label:first-child{margin-top:0;}
+
+  .field{margin-bottom:13px;}
+  label{display:block;font-size:11px;font-weight:600;color:var(--text-dim);margin-bottom:5px;letter-spacing:0.3px;}
+  label .req{color:var(--accent);}
+  input[type=text],input[type=date],input[type=number],textarea,select{
+    width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);
+    padding:10px 12px;border-radius:var(--radius);font-size:13px;outline:none;
+    transition:border-color .2s;-webkit-appearance:none;appearance:none;}
+  input:focus,textarea:focus,select:focus{border-color:var(--accent);}
+  textarea{resize:vertical;min-height:80px;line-height:1.5;}
+  select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2394A3B8' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+
+  .info-note{background:rgba(20,184,166,0.07);border:1px solid rgba(20,184,166,0.25);
+    border-radius:6px;padding:8px 12px;font-size:10px;color:var(--teal);
+    margin-top:-4px;margin-bottom:10px;line-height:1.5;}
+
+  .photo-section-label{font-size:9px;font-weight:700;letter-spacing:1.5px;color:var(--teal);
+    text-transform:uppercase;margin:20px 0 10px;padding-bottom:6px;border-bottom:1px solid rgba(20,184,166,0.25);}
+  .photo-zone{border:2px dashed var(--border);border-radius:var(--radius);padding:18px;text-align:center;
+    cursor:pointer;transition:border-color .2s,background .2s;background:var(--surface);}
+  .photo-zone:hover,.photo-zone.dragover{border-color:var(--teal);background:rgba(20,184,166,0.04);}
+  .zone-icon{font-size:26px;margin-bottom:6px;}
+  .zone-title{font-size:12px;font-weight:600;color:var(--text-dim);}
+  .zone-sub{font-size:10px;color:var(--text-muted);margin-top:3px;}
+  input[type=file]{display:none;}
+
+  .photo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px;}
+  .photo-thumb{position:relative;aspect-ratio:1;border-radius:6px;overflow:hidden;border:1px solid var(--border);background:var(--surface2);}
+  .photo-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
+  .del-btn{position:absolute;top:4px;right:4px;background:rgba(0,0,0,0.75);border:none;color:#fff;
+    font-size:13px;width:22px;height:22px;border-radius:50%;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;line-height:1;}
+  .photo-badge{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,0.72);
+    padding:3px 5px;font-size:8px;text-align:center;font-family:var(--mono);line-height:1.2;}
+  .badge-compress{color:var(--accent);}
+  .badge-upload{color:#60A5FA;}
+  .badge-done{color:var(--success);}
+  .badge-error{color:var(--danger);}
+
+  .upload-progress{margin-top:8px;display:none;}
+  .upload-progress.show{display:block;}
+  .progress-track{background:var(--surface2);border-radius:4px;height:5px;overflow:hidden;}
+  .progress-fill{height:100%;background:var(--teal);border-radius:4px;transition:width .3s;}
+  .progress-text{font-size:10px;color:var(--text-muted);margin-top:4px;text-align:center;font-family:var(--mono);}
+
+  .submit-btn{width:100%;background:var(--accent);color:#0F172A;border:none;padding:14px;
+    border-radius:var(--radius);font-size:14px;font-weight:800;cursor:pointer;letter-spacing:0.5px;
+    margin-top:20px;transition:opacity .2s;}
+  .submit-btn:hover{opacity:.9;}
+  .submit-btn:disabled{opacity:.5;cursor:not-allowed;}
+
+  .status-box{display:none;background:var(--surface2);border:1px solid var(--border);
+    border-radius:var(--radius);padding:20px;text-align:center;margin-top:16px;}
+  .status-box.show{display:block;}
+  .status-box.success{border-color:var(--success);}
+  .status-box.error{border-color:var(--danger);}
+  .status-icon{font-size:36px;margin-bottom:10px;}
+  .status-title{font-size:16px;font-weight:700;margin-bottom:8px;}
+  .status-msg{font-size:12px;color:var(--text-muted);line-height:1.7;}
+  .drive-links{margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.08);}
+  .drive-links p{font-size:10px;color:var(--text-muted);margin-bottom:6px;}
+  .drive-link{display:inline-block;margin:2px 0;color:var(--teal);font-size:11px;
+    text-decoration:none;border-bottom:1px dashed var(--teal);}
+  .reset-btn{background:none;border:1px solid var(--border);color:var(--text);
+    padding:8px 20px;border-radius:var(--radius);font-size:12px;cursor:pointer;margin-top:14px;}
+
+  .spinner{display:inline-block;width:15px;height:15px;border:2px solid rgba(0,0,0,0.3);
+    border-top-color:#0F172A;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px;}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  .footer{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);
+    padding:8px 16px;font-size:10px;color:var(--text-muted);text-align:center;}
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <div class="logo">CI</div>
+  <div><h1>CI PROJECT FORM</h1><p>Production · Continuous Improvement Dept</p></div>
+</div>
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="switchTab('project')" id="tab-project">📋 PROJECT/PERBAIKAN </button>
+  <button class="tab-btn" onclick="switchTab('issue')" id="tab-issue">🔴 LAPORKAN MASALAH</button>
+</div>
+
+<!-- ══════════════ FORM PROJECT ══════════════ -->
+<div class="form-wrap" id="form-project">
+
+  <div class="submitter-banner">
+    <span class="banner-label">Nama Pengaju <span style="color:var(--danger)">*</span></span>
+    <input type="text" id="pj-submitter" placeholder="Nama kamu / tim / departemen" autocomplete="name">
+    <small>Isi nama terlebih dahulu sebelum melanjutkan form di bawah.</small>
+  </div>
+
+  <div class="section-label">Informasi Project</div>
+
+  <div class="field">
+    <label>Judul / Nama Project <span class="req">*</span></label>
+    <input type="text" id="pj-name" placeholder="Contoh: Perbaikan Pompa CIP Line 2" maxlength="120">
+  </div>
+
+  <div class="row2">
+    <div class="field">
+      <label>Kategori <span class="req">*</span></label>
+      <!--
+        FIX [2]: Value disesuaikan dengan kategori yang dikenali dashboard v16.
+        Dashboard mengenali: perbaikan | improve | 5R | SHE
+        (lihat CSS .cat-perbaikan, .cat-improve, .cat-5r, .cat-she di dashboard)
+      -->
+      <select id="pj-cat">
+        <option value="perbaikan">🔧 Perbaikan / Corrective</option>
+        <option value="improve">💡 Improvement / CI</option>
+        <option value="5R">🧹 5R / Housekeeping</option>
+        <option value="SHE">🦺 HSE / Safety</option>
+        <option value="perbaikan">🔩 Preventive Maintenance</option>
+        <option value="improve">📋 SOP / Work Instruction</option>
+        <option value="improve">🏗 Proyek Baru</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Prioritas</label>
+      <select id="pj-prio">
+        <option value="H">🔴 High</option>
+        <option value="M" selected>🟡 Medium</option>
+        <option value="L">🟢 Low</option>
+      </select>
+    </div>
+  </div>
+  <div class="info-note">ℹ️ Kategori menentukan tampilan badge di dashboard CI Command Center.</div>
+
+  <div class="field">
+    <label>Lokasi / Area <span class="req">*</span></label>
+    <input type="text" id="pj-loc" placeholder="Contoh: Line 2, Ruang Utilitas, Area CIP...">
+  </div>
+
+  <div class="field">
+    <label>Nomor EJO (jika sudah ada)</label>
+    <input type="text" id="pj-ejo" placeholder="EJO-XXXXX" style="font-family:var(--mono);">
+  </div>
+
+  <div class="section-label">Deskripsi</div>
+
+  <div class="field">
+    <label>Latar Belakang / Root Cause</label>
+    <textarea id="pj-desc" placeholder="Jelaskan latar belakang, masalah yang terjadi, atau tujuan project ini..."></textarea>
+  </div>
+
+  <div class="field">
+    <label>Catatan Tambahan</label>
+    <textarea id="pj-notes" placeholder="Referensi, permintaan khusus, dsb..." style="min-height:60px;"></textarea>
+  </div>
+
+  <div class="photo-section-label">📷 Foto Kondisi / Lokasi</div>
+
+  <div class="photo-zone" id="pj-photo-zone"
+       onclick="document.getElementById('pj-file').click()"
+       ondrop="handleDrop(event,'pj')"
+       ondragover="event.preventDefault();this.classList.add('dragover')"
+       ondragleave="this.classList.remove('dragover')">
+    <div class="zone-icon">📷</div>
+    <div class="zone-title">Tap untuk ambil / pilih foto</div>
+    <div class="zone-sub">Maks 3 foto · Dikompres otomatis (max ~500KB) lalu disimpan ke Google Drive</div>
+    <input type="file" id="pj-file" accept="image/*" multiple capture="environment" onchange="handleSelect(this,'pj')">
+  </div>
+  <div class="photo-grid" id="pj-grid"></div>
+  <div class="upload-progress" id="pj-prog">
+    <div class="progress-track"><div class="progress-fill" id="pj-prog-fill" style="width:0%"></div></div>
+    <div class="progress-text" id="pj-prog-lbl"></div>
+  </div>
+
+  <div id="pj-status" class="status-box"></div>
+  <button class="submit-btn" id="pj-btn" onclick="submitProject()">📤 KIRIM REQUEST PROJECT</button>
+</div>
+
+<!-- ══════════════ FORM ISSUE ══════════════ -->
+<div class="form-wrap" id="form-issue" style="display:none;">
+
+  <div class="submitter-banner">
+    <span class="banner-label">Nama Pelapor <span style="color:var(--danger)">*</span></span>
+    <input type="text" id="is-submitter" placeholder="Nama kamu / departemen" autocomplete="name">
+    <small>Isi nama terlebih dahulu sebelum melanjutkan laporan di bawah.</small>
+  </div>
+
+  <div class="section-label">Detail Masalah</div>
+
+  <div class="field">
+    <label>Judul Masalah <span class="req">*</span></label>
+    <input type="text" id="is-name" placeholder="Contoh: Kebocoran pipa steam boiler, Alarm HMI error..." maxlength="120">
+  </div>
+
+  <div class="row2">
+    <div class="field">
+      <label>Kategori</label>
+      <select id="is-cat">
+        <option value="mesin">Mesin / Equipment</option>
+        <option value="utilitas">Utilitas (Steam/Air/Listrik)</option>
+        <option value="safety">Safety / HSE</option>
+        <option value="proses">Proses Produksi</option>
+        <option value="kualitas">Kualitas</option>
+        <option value="lainnya">Lainnya</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Prioritas</label>
+      <select id="is-prio">
+        <option value="critical">🚨 Critical</option>
+        <option value="H">🔴 High</option>
+        <option value="M" selected>🟡 Medium</option>
+        <option value="L">🟢 Low</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="field">
+    <label>Lokasi / Area <span class="req">*</span></label>
+    <input type="text" id="is-loc" placeholder="Nama mesin, area, line produksi...">
+  </div>
+
+  <div class="field">
+    <label>Deskripsi Masalah <span class="req">*</span></label>
+    <textarea id="is-desc" placeholder="Jelaskan masalah yang terjadi, kapan mulai, gejala yang terlihat..."></textarea>
+  </div>
+
+  <div class="row2">
+    <div class="field">
+      <label>Tanggal Kejadian</label>
+      <input type="date" id="is-date">
+    </div>
+    <div class="field">
+      <label>Downtime (menit)</label>
+      <input type="number" id="is-downtime" placeholder="0" min="0">
+    </div>
+  </div>
+
+  <div class="field">
+    <label>Tindakan Sementara</label>
+    <textarea id="is-action" placeholder="Langkah darurat, bypass, isolasi yang sudah dilakukan..." style="min-height:60px;"></textarea>
+  </div>
+
+  <div class="photo-section-label">📷 Foto Kondisi / Kerusakan</div>
+
+  <div class="photo-zone" id="is-photo-zone"
+       onclick="document.getElementById('is-file').click()"
+       ondrop="handleDrop(event,'is')"
+       ondragover="event.preventDefault();this.classList.add('dragover')"
+       ondragleave="this.classList.remove('dragover')">
+    <div class="zone-icon">📷</div>
+    <div class="zone-title">Tap untuk foto kondisi alat / kerusakan</div>
+    <div class="zone-sub">Maks 3 foto · Dikompres otomatis (max ~500KB) lalu disimpan ke Google Drive</div>
+    <input type="file" id="is-file" accept="image/*" multiple capture="environment" onchange="handleSelect(this,'is')">
+  </div>
+  <div class="photo-grid" id="is-grid"></div>
+  <div class="upload-progress" id="is-prog">
+    <div class="progress-track"><div class="progress-fill" id="is-prog-fill" style="width:0%"></div></div>
+    <div class="progress-text" id="is-prog-lbl"></div>
+  </div>
+
+  <div id="is-status" class="status-box"></div>
+  <button class="submit-btn" id="is-btn" onclick="submitIssue()">🚨 LAPORKAN MASALAH</button>
+</div>
+
+<div class="footer">CI Project Command Center · Production / Continuous Improvement Dept · v3</div>
+
+<script>
+// ══════════════════════════════════════════════════════════════
+// CI FORM v3 — Fixed for integration with CI Dashboard v16
+//
+// CHANGELOG v3:
+//   FIX [1] redirect:'follow' pada SEMUA fetch ke Apps Script
+//           → tanpa ini, browser menolak redirect dari Apps Script
+//   FIX [2] Kategori project disesuaikan dgn value yg dikenal dashboard
+//           → perbaikan | improve | 5R | SHE  (bukan pm/proyek/sop/lainnya)
+//   FIX [3] activityLog di-trim max 50 entri sebelum pushData
+//           → cegah payload meledak melampaui limit 50KB cell Sheets
+//   FIX [4] Timeout 25 detik pada setiap fetch (AbortController)
+//           → form tidak stuck selamanya saat Apps Script lambat/cold start
+//   FIX [5] Error message lebih informatif — tampilkan HTTP status & pesan asli
+// ══════════════════════════════════════════════════════════════
+
+// ── CONFIG ────────────────────────────────────────────────────
+const SYNC_URL         = 'https://script.google.com/macros/s/AKfycby5RKWJP0yhGDUubEjOxP-t6gcXR2MwfbRZvru5zRXolh94wtzt76lAo3DxfV6nhFjn/exec';
+const MAX_PHOTOS       = 3;
+const COMPRESS_MAX_PX  = 1024;
+const COMPRESS_QUALITY = 0.60;
+const MAX_ORIGINAL_MB  = 15;
+const FETCH_TIMEOUT_MS = 25000;  // FIX [4]: timeout 25 detik untuk semua fetch
+
+// ── STATE ─────────────────────────────────────────────────────
+const S = { pj:[], is:[] };
+
+// ── TABS ──────────────────────────────────────────────────────
+function switchTab(t) {
+  ['project','issue'].forEach(id=>{
+    document.getElementById('form-'+id).style.display = id===t?'block':'none';
+    document.getElementById('tab-'+id).classList.toggle('active', id===t);
+  });
+}
+
+// ── UTILS ─────────────────────────────────────────────────────
+const genId    = p  => p+'-'+Date.now()+Math.floor(Math.random()*999);
+const todayStr = () => { const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); };
+const fmtBytes = b  => b<1024?b+'B':b<1048576?(b/1024).toFixed(0)+'KB':(b/1048576).toFixed(1)+'MB';
+const safeName = s  => (s||'').replace(/[\\/:*?"<>|]/g,'').trim().slice(0,50)||'Form';
+
+// ── FIX [1][4]: Wrapper fetch dengan redirect:follow + timeout ─
+async function fetchGAS(url, options={}) {
+  const controller = new AbortController();
+  const tid = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+  try {
+    const res = await fetch(url, {
+      ...options,
+      redirect: 'follow',           // FIX [1]: Apps Script selalu redirect — wajib follow
+      signal:   controller.signal,
+    });
+    clearTimeout(tid);
+    return res;
+  } catch(e) {
+    clearTimeout(tid);
+    // FIX [4]: Pesan timeout yang jelas
+    if (e.name === 'AbortError') throw new Error('Request timeout (>25 detik). Cek koneksi atau coba lagi.');
+    throw e;
+  }
+}
+
+// ── COMPRESSION ────────────────────────────────────────────────
+function compressImage(file) {
+  return new Promise((res, rej) => {
+    if (file.size > MAX_ORIGINAL_MB * 1048576) { rej(new Error('File terlalu besar (>'+MAX_ORIGINAL_MB+'MB)')); return; }
+    const reader = new FileReader();
+    reader.onerror = rej;
+    reader.onload = ev => {
+      const img = new Image();
+      img.onerror = rej;
+      img.onload = () => {
+        let {width:w, height:h} = img;
+        if (w > COMPRESS_MAX_PX || h > COMPRESS_MAX_PX) {
+          if (w >= h) { h = Math.round(h*COMPRESS_MAX_PX/w); w = COMPRESS_MAX_PX; }
+          else        { w = Math.round(w*COMPRESS_MAX_PX/h); h = COMPRESS_MAX_PX; }
+        }
+        const cv = document.createElement('canvas');
+        cv.width=w; cv.height=h;
+        cv.getContext('2d').drawImage(img,0,0,w,h);
+        const dataUrl = cv.toDataURL('image/jpeg', COMPRESS_QUALITY);
+        const b64     = dataUrl.split(',')[1];
+        res({ base64:b64, mimeType:'image/jpeg', origSize:file.size,
+              compSize:Math.round(b64.length*0.75), w, h, dataUrl });
+      };
+      img.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+// ── PHOTO HANDLERS ─────────────────────────────────────────────
+function handleSelect(input, p) { processFiles([...input.files], p); input.value=''; }
+function handleDrop(e, p) {
+  e.preventDefault();
+  document.getElementById(p+'-photo-zone').classList.remove('dragover');
+  processFiles([...e.dataTransfer.files].filter(f=>f.type.startsWith('image/')), p);
+}
+
+async function processFiles(files, p) {
+  const avail = MAX_PHOTOS - S[p].length;
+  if (!avail) { alert('Maksimal '+MAX_PHOTOS+' foto.'); return; }
+  const batch = files.slice(0, avail);
+  setProgress(p, true, 'Mengkompres foto...', 5);
+  for (let i=0; i<batch.length; i++) {
+    const file = batch[i];
+    const idx  = S[p].length;
+    S[p].push({ name:file.name, localUrl:URL.createObjectURL(file), status:'compressing',
+                base64:null, mimeType:null, origSize:file.size, compSize:null });
+    renderGrid(p);
+    setProgress(p, true, `Mengkompres ${i+1}/${batch.length}...`, Math.round(10+(i/batch.length)*60));
+    try {
+      const r = await compressImage(file);
+      Object.assign(S[p][idx], { base64:r.base64, mimeType:r.mimeType, compSize:r.compSize,
+        localUrl:r.dataUrl, status:'ready' });
+    } catch(err) {
+      S[p][idx].status = 'error'; S[p][idx].errMsg = err.message;
+    }
+    renderGrid(p);
+  }
+  setProgress(p, false);
+  updateZone(p);
+}
+
+function renderGrid(p) {
+  const grid = document.getElementById(p+'-grid');
+  if (!S[p].length) { grid.innerHTML=''; return; }
+  grid.innerHTML = S[p].map((ph,i) => {
+    const badge = ph.status==='compressing' ? `<div class="photo-badge badge-compress">⏳ kompres</div>`
+      : ph.status==='uploading' ? `<div class="photo-badge badge-upload">⬆ upload</div>`
+      : ph.status==='done'      ? `<div class="photo-badge badge-done">✅ Drive</div>`
+      : ph.status==='error'     ? `<div class="photo-badge badge-error">❌ ${ph.errMsg||'error'}</div>`
+      : ph.compSize ? `<div class="photo-badge badge-done">${fmtBytes(ph.compSize)}</div>` : '';
+    return `<div class="photo-thumb">
+      <img src="${ph.localUrl}" alt="foto ${i+1}">
+      ${badge}
+      <button class="del-btn" onclick="removePhoto('${p}',${i})">×</button>
+    </div>`;
+  }).join('');
+}
+
+function removePhoto(p, i) { S[p].splice(i,1); renderGrid(p); updateZone(p); }
+
+function updateZone(p) {
+  const n    = S[p].length;
+  const zone = document.getElementById(p+'-photo-zone');
+  zone.querySelector('.zone-title').textContent = n>=MAX_PHOTOS
+    ? MAX_PHOTOS+' foto (maksimal)'
+    : n>0 ? n+' foto dipilih — tap untuk tambah lagi'
+    : 'Tap untuk ambil / pilih foto';
+  zone.querySelector('.zone-sub').textContent = n>=MAX_PHOTOS
+    ? 'Hapus salah satu untuk mengganti'
+    : n>0 ? 'Maks '+(MAX_PHOTOS-n)+' foto lagi · Dikompres otomatis (max ~500KB)'
+    : 'Maks 3 foto · Dikompres otomatis (max ~500KB) lalu disimpan ke Google Drive';
+}
+
+function setProgress(p, show, lbl='', pct=0) {
+  const el = document.getElementById(p+'-prog');
+  el.classList.toggle('show', show);
+  if (show) {
+    document.getElementById(p+'-prog-fill').style.width = pct+'%';
+    document.getElementById(p+'-prog-lbl').textContent  = lbl;
+  }
+}
+
+// ── DRIVE UPLOAD ─────────────────────────────────────────────
+async function uploadToDrive(ph, subFolder, submitter) {
+  const body = JSON.stringify({
+    action:    'uploadPhoto',
+    photoData: ph.base64,
+    mimeType:  ph.mimeType,
+    fileName:  ph.name.replace(/\.[^.]+$/,'')+'_'+Date.now()+'.jpg',
+    subFolder, submitter,
+  });
+  // FIX [1][4]: fetchGAS → redirect:follow + timeout 25s
+  const res = await fetchGAS(SYNC_URL, {
+    method:  'POST',
+    headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
+    body,
+  });
+  // FIX [5]: error HTTP lebih informatif
+  if (!res.ok) throw new Error(`Upload gagal — HTTP ${res.status} ${res.statusText}`);
+  const data = await res.json();
+  if (!data.ok) throw new Error(data.error || 'Upload ke Drive gagal (tidak ada pesan error)');
+  return data;
+}
+
+async function uploadAll(p, subFolder, submitter) {
+  const ready = S[p].filter(ph=>ph.status==='ready'&&ph.base64);
+  if (!ready.length) return [];
+  const results = [];
+  for (let i=0; i<ready.length; i++) {
+    const ph  = ready[i];
+    const idx = S[p].indexOf(ph);
+    setProgress(p, true, `Upload foto ${i+1}/${ready.length} ke Google Drive...`,
+      Math.round(60+(i/ready.length)*35));
+    S[p][idx].status='uploading'; renderGrid(p);
+    try {
+      const r = await uploadToDrive(ph, subFolder, submitter);
+      S[p][idx].driveUrl=r.viewUrl; S[p][idx].driveId=r.fileId; S[p][idx].status='done';
+      results.push({ name:ph.name, viewUrl:r.viewUrl, thumbUrl:r.thumbUrl, fileId:r.fileId });
+    } catch(err) {
+      S[p][idx].status='error'; S[p][idx].errMsg=err.message;
+      results.push({ name:ph.name, error:err.message });
+    }
+    renderGrid(p);
+  }
+  setProgress(p, false);
+  return results;
+}
+
+// ── SHEETS API ────────────────────────────────────────────────
+// FIX [1][4]: loadData menggunakan fetchGAS (redirect:follow + timeout)
+async function loadData() {
+  const r = await fetchGAS(SYNC_URL + '?t=' + Date.now(), { method: 'GET' });
+  // FIX [5]: error lebih informatif
+  if (!r.ok) throw new Error(`Gagal load data — HTTP ${r.status} ${r.statusText}`);
+  const text = await r.text();
+  try { return JSON.parse(text); }
+  catch(e) { throw new Error('Response dari Apps Script bukan JSON valid. Cek URL & deployment.'); }
+}
+
+// FIX [1][3][4][5]: pushData dengan redirect:follow + trim activityLog + timeout + error detail
+async function pushData(d) {
+  // FIX [3]: Trim activityLog agar payload tidak meledak melampaui 50KB limit Sheets
+  const payload = { ...d };
+  if (Array.isArray(payload.activityLog) && payload.activityLog.length > 50) {
+    payload.activityLog = payload.activityLog.slice(0, 50);
+  }
+  // Jika masih sangat besar (>180KB), hapus materialMaster — ada di sheet tersendiri
+  let body = JSON.stringify(payload);
+  if (body.length > 180000) {
+    delete payload.materialMaster;
+    body = JSON.stringify(payload);
+  }
+  // FIX [1][4]: fetchGAS → redirect:follow + timeout 25s
+  const r = await fetchGAS(SYNC_URL, {
+    method:  'POST',
+    headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
+    body,
+  });
+  // FIX [5]: error HTTP lebih informatif
+  if (!r.ok) throw new Error(`Gagal simpan — HTTP ${r.status} ${r.statusText}`);
+  const txt = await r.text();
+  if (txt.startsWith('ERROR')) throw new Error('Apps Script error: ' + txt);
+}
+
+// ── VALIDATE ──────────────────────────────────────────────────
+function validate(fields) {
+  for (const [id, lbl] of fields) {
+    const el = document.getElementById(id);
+    if (!el?.value.trim()) { el?.focus(); alert('⚠ "'+lbl+'" wajib diisi.'); return false; }
+  }
+  return true;
+}
+
+// ── SHOW STATUS ───────────────────────────────────────────────
+function showStatus(p, type, icon, title, msg, links) {
+  const box = document.getElementById(p+'-status');
+  const linksHtml = links?.filter(l=>l.viewUrl).length
+    ? `<div class="drive-links"><p>📁 Foto tersimpan di Google Drive:</p>`
+      + links.filter(l=>l.viewUrl).map((l,i)=>`<a class="drive-link" href="${l.viewUrl}" target="_blank">📷 Foto ${i+1} — Lihat di Drive</a>`).join('<br>')
+      + '</div>'
+    : '';
+  box.className='status-box show '+type;
+  box.innerHTML=`<div class="status-icon">${icon}</div><div class="status-title">${title}</div>
+    <div class="status-msg">${msg}</div>${linksHtml}
+    <button class="reset-btn" onclick="resetForm('${p}')">← Isi Form Lagi</button>`;
+  box.scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+// ── RESET ─────────────────────────────────────────────────────
+function resetForm(p) {
+  const fid = p==='pj'?'project':'issue';
+  document.querySelectorAll('#form-'+fid+' input, #form-'+fid+' textarea, #form-'+fid+' select').forEach(el=>{
+    if(el.type==='select-one') el.selectedIndex=el.id.includes('prio')?1:0;
+    else if(el.type!=='file') el.value='';
+  });
+  S[p]=[]; renderGrid(p); updateZone(p);
+  document.getElementById(p+'-status').className='status-box';
+  const btn=document.getElementById(p+'-btn');
+  btn.disabled=false;
+  btn.innerHTML=p==='pj'?'📤 KIRIM REQUEST PROJECT':'🚨 LAPORKAN MASALAH';
+  if(p==='is') document.getElementById('is-date').value=todayStr();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ── SUBMIT PROJECT ────────────────────────────────────────────
+async function submitProject() {
+  if (!validate([['pj-submitter','Nama Pengaju'],['pj-name','Judul Project'],['pj-loc','Lokasi / Area']])) return;
+  const btn = document.getElementById('pj-btn');
+  btn.disabled=true; btn.innerHTML='<span class="spinner"></span> Memproses...';
+  const submitter = document.getElementById('pj-submitter').value.trim();
+  const projName  = document.getElementById('pj-name').value.trim();
+  try {
+    const sub    = safeName('PROJECT_'+projName+'_'+todayStr());
+    const photos = await uploadAll('pj', sub, submitter);
+
+    btn.innerHTML = '<span class="spinner"></span> Menyimpan ke dashboard...';
+    const data = await loadData();
+
+    const proj = {
+      id:        genId('PROJ'),
+      name:      projName,
+      // FIX [2]: value sudah sesuai dashboard (perbaikan/improve/5R/SHE)
+      category:  document.getElementById('pj-cat').value,
+      priority:  document.getElementById('pj-prio').value,
+      location:  document.getElementById('pj-loc').value.trim(),
+      ejo:       document.getElementById('pj-ejo').value.trim(),
+      rootcause: document.getElementById('pj-desc').value.trim(),
+      notes:     document.getElementById('pj-notes').value.trim(),
+      status:    'open', progress:0, matStatus:'pending', phases:[],
+      createdAt: Date.now(), submittedBy: submitter,
+      photos, driveFolder: sub,
+      _source: 'ci-form', _submittedAt: new Date().toISOString(),
+    };
+
+    const log = {
+      id:   genId('LOG'), ts: Date.now(), type: 'project_created',
+      msg:  `[FORM] Project dari ${submitter}: "${projName}"`,
+      user: submitter, projId: proj.id,
+    };
+
+    // FIX [3]: activityLog baru ditambah di depan, trim terjadi di dalam pushData
+    const projects    = [proj, ...(data.projects    || [])];
+    const activityLog = [log,  ...(data.activityLog || [])];
+    await pushData({ ...data, projects, activityLog });
+
+    const n = photos.filter(ph=>ph.viewUrl).length;
+    showStatus('pj','success','✅','Request Berhasil Dikirim!',
+      `Project "<strong>${projName}</strong>" telah masuk ke dashboard CI.`
+      +(n?`<br>📷 ${n} foto disimpan di Google Drive (folder: <em>${sub}</em>).`:'')
+      +`<br><br>Tim CI akan menentukan jadwal pengerjaan.`, photos);
+
+  } catch(err) {
+    console.error('[submitProject]', err);
+    btn.disabled=false; btn.innerHTML='📤 KIRIM REQUEST PROJECT';
+    // FIX [5]: tampilkan pesan error asli
+    showStatus('pj','error','❌','Gagal Mengirim',
+      'Terjadi kesalahan. Coba lagi atau hubungi tim CI langsung.'
+      +`<br><small style="font-family:monospace;opacity:.55;font-size:10px;">${err.message}</small>`);
+  }
+}
+
+// ── SUBMIT ISSUE ──────────────────────────────────────────────
+async function submitIssue() {
+  if (!validate([['is-submitter','Nama Pelapor'],['is-name','Judul Masalah'],['is-loc','Lokasi / Area'],['is-desc','Deskripsi Masalah']])) return;
+  const btn = document.getElementById('is-btn');
+  btn.disabled=true; btn.innerHTML='<span class="spinner"></span> Memproses...';
+  const submitter = document.getElementById('is-submitter').value.trim();
+  const issueName = document.getElementById('is-name').value.trim();
+  try {
+    const sub    = safeName('ISSUE_'+issueName+'_'+todayStr());
+    const photos = await uploadAll('is', sub, submitter);
+
+    btn.innerHTML='<span class="spinner"></span> Menyimpan ke dashboard...';
+    const data = await loadData();
+
+    const issue = {
+      id:          genId('ISS'),
+      name:        issueName,
+      category:    document.getElementById('is-cat').value,
+      priority:    document.getElementById('is-prio').value,
+      location:    document.getElementById('is-loc').value.trim(),
+      description: document.getElementById('is-desc').value.trim(),
+      date:        document.getElementById('is-date').value || todayStr(),
+      downtime:    document.getElementById('is-downtime').value || '0',
+      actionTaken: document.getElementById('is-action').value.trim(),
+      status:      'open', createdAt: Date.now(), submittedBy: submitter,
+      photos, driveFolder: sub,
+      _source: 'ci-form', _submittedAt: new Date().toISOString(),
+    };
+
+    const log = {
+      id:   genId('LOG'), ts: Date.now(), type: 'issue_created',
+      msg:  `[FORM] Laporan dari ${submitter}: "${issueName}" di ${issue.location}`,
+      user: submitter,
+    };
+
+    // FIX [3]: activityLog baru ditambah di depan, trim terjadi di dalam pushData
+    const issues      = [issue, ...(data.issues      || [])];
+    const activityLog = [log,   ...(data.activityLog || [])];
+    await pushData({ ...data, issues, activityLog });
+
+    const n = photos.filter(ph=>ph.viewUrl).length;
+    showStatus('is','success','✅','Laporan Berhasil Dikirim!',
+      `Laporan "<strong>${issueName}</strong>" telah masuk ke dashboard CI.`
+      +(n?`<br>📷 ${n} foto disimpan di Google Drive (folder: <em>${sub}</em>).`:'')
+      +`<br><br>Tim CI akan segera menindaklanjuti laporan ini.`, photos);
+
+  } catch(err) {
+    console.error('[submitIssue]', err);
+    btn.disabled=false; btn.innerHTML='🚨 LAPORKAN MASALAH';
+    // FIX [5]: tampilkan pesan error asli
+    showStatus('is','error','❌','Gagal Mengirim',
+      'Terjadi kesalahan. Coba lagi atau hubungi tim CI langsung.'
+      +`<br><small style="font-family:monospace;opacity:.55;font-size:10px;">${err.message}</small>`);
+  }
+}
+
+// ── INIT ──────────────────────────────────────────────────────
+document.getElementById('is-date').value = todayStr();
+</script>
+</body>
+</html>
