@@ -539,6 +539,34 @@ body{
     <span id="form-user-text"></span>
   </div>
 
+  <!-- Edit mode banner -->
+  <div id="edit-mode-banner" style="display:none;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.4);border-radius:var(--radius-sm);padding:11px 14px;margin-bottom:4px;display:none;">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="font-size:18px;">✏️</span>
+        <div>
+          <div style="font-size:13px;font-weight:700;color:var(--amber);">Mode Edit Laporan</div>
+          <div style="font-size:10px;color:var(--text2);" id="edit-banner-sub">Mengubah laporan sebelumnya</div>
+        </div>
+      </div>
+      <button onclick="cancelEdit()" style="background:rgba(245,158,11,.2);border:1px solid rgba(245,158,11,.4);border-radius:6px;padding:5px 10px;font-size:11px;font-weight:700;color:var(--amber);cursor:pointer;">Batal Edit</button>
+    </div>
+  </div>
+
+  <!-- Update/lanjutan banner -->
+  <div id="update-mode-banner" style="display:none;background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.3);border-radius:var(--radius-sm);padding:11px 14px;margin-bottom:4px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="font-size:18px;">🔄</span>
+        <div>
+          <div style="font-size:13px;font-weight:700;color:var(--blue);">Update Lanjutan</div>
+          <div style="font-size:10px;color:var(--text2);" id="update-banner-sub">Menambah update ke laporan sebelumnya</div>
+        </div>
+      </div>
+      <button onclick="cancelEdit()" style="background:rgba(59,130,246,.15);border:1px solid rgba(59,130,246,.3);border-radius:6px;padding:5px 10px;font-size:11px;font-weight:700;color:var(--blue);cursor:pointer;">Batal</button>
+    </div>
+  </div>
+
   <div class="sec-label">Form Laporan Pekerjaan</div>
 
   <!-- Tanggal -->
@@ -664,7 +692,7 @@ body{
   <!-- Submit -->
   <button class="btn-primary" id="submitBtn" onclick="submitReport()">
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z"/></svg>
-    <span>Kirim Laporan</span>
+    <span id="submitBtnLabel">Kirim Laporan</span>
   </button>
 
   <div style="height:12px;"></div>
@@ -826,6 +854,119 @@ function startApp(){
   renderMyReports();
   if(GAS_URL) syncData();
   else renderWOList();
+}
+
+// ════════════════════════════════════════
+// EDIT & UPDATE MODE
+// ════════════════════════════════════════
+let _editMode   = null; // null | 'edit' | 'update'
+let _editId     = null; // id laporan yang diedit
+let _parentId   = null; // id laporan induk (untuk update lanjutan)
+
+function startEditReport(id){
+  const r = state.myReports.find(x=>x.id===id);
+  if(!r){ toast('Laporan tidak ditemukan','error'); return; }
+
+  _editMode = 'edit';
+  _editId   = id;
+  _parentId = null;
+
+  // Isi semua field dengan data laporan lama
+  document.getElementById('f-date').value       = r.date||'';
+  document.getElementById('f-tech').value       = r.tech||'';
+  document.getElementById('f-area').value       = r.area||'';
+  document.getElementById('f-plan').value       = r.woRef||r.plan||'';
+  document.getElementById('f-work').value       = r.work||'';
+  document.getElementById('f-time-start').value = r.timeStart||'';
+  document.getElementById('f-time-end').value   = r.timeEnd||'';
+  document.getElementById('f-notes').value      = r.notes||'';
+
+  // Ad-hoc
+  const adhocChk = document.getElementById('f-adhoc-check');
+  if(adhocChk){ adhocChk.checked = !!r.isAdhoc; toggleAdhoc(!!r.isAdhoc); }
+  if(r.adhocTitle) document.getElementById('f-adhoc-title').value = r.adhocTitle;
+
+  // Status
+  selectStatus(r.status||'progress');
+
+  // Foto — load existing photos as preview (tanpa re-upload)
+  state.photos = (r.photos||[]).map(p=>({
+    dataUrl:   p.dataUrl||p.thumb||p.url||'',
+    url:       p.url||'',
+    thumb:     p.thumb||'',
+    existing:  true, // mark sebagai foto lama, tidak perlu re-upload
+  }));
+  renderPhotoGrid();
+
+  // Tampilkan banner
+  document.getElementById('edit-mode-banner').style.display = 'flex';
+  document.getElementById('update-mode-banner').style.display = 'none';
+  document.getElementById('edit-banner-sub').textContent =
+    `Laporan: ${fmtDate(r.date)} · ${r.work.slice(0,40)}`;
+
+  // Update tombol submit
+  document.getElementById('submitBtnLabel').textContent = 'Simpan Perubahan';
+
+  // Navigate ke form
+  goPage('form', document.getElementById('tab-form'));
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function startUpdateLanjutan(id){
+  const r = state.myReports.find(x=>x.id===id);
+  if(!r){ toast('Laporan tidak ditemukan','error'); return; }
+  if(r.status==='done'){ toast('Laporan sudah Done, tidak bisa diupdate','warn'); return; }
+
+  _editMode = 'update';
+  _editId   = null;
+  _parentId = id;
+
+  // Pre-fill dari laporan sebelumnya
+  const today = new Date().toISOString().slice(0,10);
+  const now   = new Date();
+  const hhmm  = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+
+  document.getElementById('f-date').value       = today;
+  document.getElementById('f-tech').value       = r.tech||TECH_NAME||'';
+  document.getElementById('f-area').value       = r.area||'';
+  document.getElementById('f-plan').value       = r.woRef||r.plan||'';
+  document.getElementById('f-work').value       = ''; // kosong — teknisi isi progress baru
+  document.getElementById('f-time-start').value = hhmm;
+  document.getElementById('f-time-end').value   = '';
+  document.getElementById('f-notes').value      = '';
+
+  // Ad-hoc sama dengan induk
+  const adhocChk = document.getElementById('f-adhoc-check');
+  if(adhocChk){ adhocChk.checked = !!r.isAdhoc; toggleAdhoc(!!r.isAdhoc); }
+  if(r.adhocTitle) document.getElementById('f-adhoc-title').value = r.adhocTitle;
+
+  // Default status = progress (kemungkinan teknisi akan update ke done)
+  selectStatus('progress');
+
+  // Foto fresh (kosong untuk foto baru hari ini)
+  state.photos = [];
+  renderPhotoGrid();
+
+  // Banner
+  document.getElementById('edit-mode-banner').style.display  = 'none';
+  document.getElementById('update-mode-banner').style.display = 'flex';
+  document.getElementById('update-banner-sub').textContent =
+    `Lanjutan dari: ${fmtDate(r.date)} — ${(r.adhocTitle||r.work).slice(0,40)}`;
+
+  // Submit button label
+  document.getElementById('submitBtnLabel').textContent = 'Kirim Update';
+
+  goPage('form', document.getElementById('tab-form'));
+  window.scrollTo({top:0, behavior:'smooth'});
+  toast('Isi pekerjaan hari ini & update status','success');
+}
+
+function cancelEdit(){
+  _editMode = null; _editId = null; _parentId = null;
+  document.getElementById('edit-mode-banner').style.display   = 'none';
+  document.getElementById('update-mode-banner').style.display = 'none';
+  document.getElementById('submitBtnLabel').textContent = 'Kirim Laporan';
+  resetForm();
 }
 
 // ════════════════════════════════════════
@@ -1013,130 +1154,111 @@ async function submitReport(){
 
   const btn = document.getElementById('submitBtn');
   btn.disabled = true;
-  btn.innerHTML = '<span>⏳ Mengirim...</span>';
+  btn.innerHTML = '<span>⏳ Menyimpan...</span>';
 
   try {
-    // 1. Upload photos to GAS
+    // 1. Upload foto BARU saja (yang tidak punya flag 'existing')
     const photoUrls = [];
-    if(GAS_URL && state.photos.length){
-      for(const p of state.photos){
+    const newPhotos = state.photos.filter(p=>!p.existing);
+    const oldPhotos = state.photos.filter(p=>p.existing);
+
+    if(GAS_URL && newPhotos.length){
+      for(const p of newPhotos){
         try {
-          const b64 = await toBase64(p.file);
+          const b64 = await toBase64(p.file||await fetch(p.dataUrl).then(r=>r.blob()));
           const res = await fetch(GAS_URL, {
             method:'POST', headers:{'Content-Type':'text/plain'},
             body: JSON.stringify({
               action:'uploadPhoto',
               photoData: b64,
-              mimeType: p.file.type||'image/jpeg',
+              mimeType: p.file?.type||'image/jpeg',
               fileName: `laporan_${tech.replace(/\s/g,'_')}_${date}_${Date.now()}.jpg`,
               submitter: tech
             })
           });
           const r = await res.json();
-          if(r.ok) photoUrls.push({url:r.viewUrl, thumb:r.thumbUrl, directUrl:r.directUrl});
-        } catch(e){ photoUrls.push({url:'',thumb:'',directUrl:''}); }
+          photoUrls.push(r.ok?{url:r.viewUrl,thumb:r.thumbUrl}:{url:'',thumb:''});
+        } catch(e){ photoUrls.push({url:'',thumb:''}); }
       }
     }
 
-    const woRef = isAdhoc ? '' : document.getElementById('f-plan').value;
-    const reportId = Date.now().toString(36) + Math.random().toString(36).slice(2,5);
+    const woRef = isAdhoc ? (_parentId
+      ? (state.myReports.find(x=>x.id===_parentId)?.woRef||'')
+      : '') : document.getElementById('f-plan').value;
 
-    // 2. Bangun report object
-    const report = {
-      id:        reportId,
-      date, tech, area,
-      woRef,                          // WO yang dipilih (kosong jika ad-hoc)
-      isAdhoc,                        // flag pekerjaan verbal
-      adhocTitle: isAdhoc ? adhocTitle : '',
-      work,
-      timeStart: tStart,
-      timeEnd:   tEnd,
-      status,                         // status pekerjaan dari teknisi
-      notes:     document.getElementById('f-notes').value,
-      photos:    state.photos.map((p,i)=>({
-        dataUrl:  p.dataUrl,
-        url:      photoUrls[i]?.url||'',
-        thumb:    photoUrls[i]?.thumb||'',
-      })),
-      createdAt: new Date().toISOString(),
-    };
+    // Gabungkan foto lama + baru
+    const allPhotos = [
+      ...oldPhotos.map(p=>({dataUrl:p.dataUrl,url:p.url||'',thumb:p.thumb||''})),
+      ...newPhotos.map((p,i)=>({dataUrl:p.dataUrl,url:photoUrls[i]?.url||'',thumb:photoUrls[i]?.thumb||''})),
+    ];
 
-    // 3. Simpan lokal
-    state.myReports.unshift(report);
-    if(state.myReports.length > 60) state.myReports = state.myReports.slice(0,60);
-    localStorage.setItem('pm_tech_reports', JSON.stringify(state.myReports));
-
-    // 4. Kirim ke GAS → masuk ke techReports di payload dashboard
-    if(GAS_URL){
-      try {
-        // Ambil data lama, tambah report baru, simpan kembali
-        const getRes  = await fetch(GAS_URL, {cache:'no-cache'});
-        const current = await getRes.json();
-        const techReports = current.techReports || [];
-        // Hilangkan dataUrl (besar) dari payload GAS, cukup URL Drive
-        const reportForGAS = {
-          ...report,
-          photos: report.photos.map(p=>({url:p.url, thumb:p.thumb})) // strip dataUrl
+    // ── MODE EDIT: update laporan yang ada ──────────────────
+    if(_editMode === 'edit' && _editId){
+      const idx = state.myReports.findIndex(x=>x.id===_editId);
+      if(idx > -1){
+        const updated = {
+          ...state.myReports[idx],
+          date, tech, area, woRef,
+          isAdhoc, adhocTitle: isAdhoc?adhocTitle:'',
+          work, timeStart:tStart, timeEnd:tEnd,
+          status, notes:document.getElementById('f-notes').value,
+          photos: allPhotos,
+          updatedAt: new Date().toISOString(),
         };
-        techReports.unshift(reportForGAS);
-
-        // Jika ad-hoc, buat WO baru otomatis di woList
-        let newWO = null;
-        if(isAdhoc){
-          const woList = current.wo || [];
-          const woNo   = 'WO-ADH-' + reportId.slice(0,6).toUpperCase();
-          newWO = {
-            id: reportId + '_wo',
-            no: woNo,
-            date,
-            type: 'corrective',
-            machine: area,
-            desc: adhocTitle,
-            priority: 'M',
-            pic: tech,
-            estDuration: '',
-            target: date,
-            status: status === 'done' ? 'done' : 'progress',
-            downtime:'', action: work, rootcause:'',
-            spareUsed:'', toolsUsed:'',
-            progress: status==='done'?100:50,
-            notes: report.notes,
-            source: 'adhoc', // flag dari technician app
-            createdAt: new Date().toISOString(),
-          };
-          woList.unshift(newWO);
-          current.wo = woList;
-        } else if(woRef && status){
-          // Update status WO terkait sesuai laporan teknisi
-          const woList = current.wo || [];
-          const idx = woList.findIndex(w=>w.no===woRef||w.id===woRef);
-          if(idx > -1){
-            const statusMap = {open:'open', progress:'progress', done:'done'};
-            woList[idx].status   = statusMap[status] || woList[idx].status;
-            woList[idx].progress = status==='done'?100:status==='progress'?50:woList[idx].progress||0;
-            woList[idx].action   = work;
-            current.wo = woList;
-          }
-        }
-
-        current.techReports = techReports.slice(0,200); // max 200
-        await fetch(GAS_URL, {
-          method:'POST', headers:{'Content-Type':'text/plain'},
-          body: JSON.stringify(current)
-        });
-
-        // Jika ada WO baru ad-hoc, update local list
-        if(newWO) state.woList.unshift(newWO);
-        state.woList = current.wo || state.woList;
-
-        toast('✓ Laporan terkirim ke dashboard!', 'success');
-      } catch(e){
-        toast('✓ Tersimpan lokal — sync gagal, coba lagi nanti', 'warn');
+        state.myReports[idx] = updated;
+        localStorage.setItem('pm_tech_reports', JSON.stringify(state.myReports));
+        await _pushToGAS();
+        toast('✓ Laporan diperbarui!','success');
       }
+
+    // ── MODE UPDATE LANJUTAN: buat laporan baru yang link ke induk ──
+    } else if(_editMode === 'update' && _parentId){
+      const parentReport = state.myReports.find(x=>x.id===_parentId);
+      const newReport = {
+        id: Date.now().toString(36)+Math.random().toString(36).slice(2,5),
+        date, tech, area, woRef,
+        isAdhoc: parentReport?.isAdhoc||isAdhoc,
+        adhocTitle: parentReport?.adhocTitle||adhocTitle,
+        work, timeStart:tStart, timeEnd:tEnd,
+        status, notes:document.getElementById('f-notes').value,
+        photos: allPhotos,
+        parentId: _parentId, // link ke laporan sebelumnya
+        createdAt: new Date().toISOString(),
+      };
+      // Jika laporan update status done, update juga laporan induk
+      if(status==='done' && parentReport){
+        const pidx = state.myReports.findIndex(x=>x.id===_parentId);
+        if(pidx>-1) state.myReports[pidx] = {...state.myReports[pidx], status:'done', updatedAt:new Date().toISOString()};
+      }
+      state.myReports.unshift(newReport);
+      if(state.myReports.length>60) state.myReports=state.myReports.slice(0,60);
+      localStorage.setItem('pm_tech_reports', JSON.stringify(state.myReports));
+      await _pushToGAS(newReport, woRef, status, isAdhoc, adhocTitle, area, date);
+      toast('✓ Update lanjutan terkirim!','success');
+
+    // ── MODE NORMAL: buat laporan baru ──────────────────────
     } else {
-      toast('✓ Laporan tersimpan (offline)', 'success');
+      const reportId = Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+      const report = {
+        id: reportId, date, tech, area, woRef,
+        isAdhoc, adhocTitle: isAdhoc?adhocTitle:'',
+        work, timeStart:tStart, timeEnd:tEnd,
+        status, notes:document.getElementById('f-notes').value,
+        photos: allPhotos,
+        createdAt: new Date().toISOString(),
+      };
+      state.myReports.unshift(report);
+      if(state.myReports.length>60) state.myReports=state.myReports.slice(0,60);
+      localStorage.setItem('pm_tech_reports', JSON.stringify(state.myReports));
+      await _pushToGAS(report, woRef, status, isAdhoc, adhocTitle, area, date);
+      toast('✓ Laporan berhasil dikirim!','success');
     }
 
+    // Reset
+    _editMode=null; _editId=null; _parentId=null;
+    document.getElementById('edit-mode-banner').style.display   = 'none';
+    document.getElementById('update-mode-banner').style.display = 'none';
+    document.getElementById('submitBtnLabel').textContent = 'Kirim Laporan';
     resetForm();
     renderMyReports();
 
@@ -1144,9 +1266,61 @@ async function submitReport(){
     toast('Gagal: '+err.message,'error');
   } finally {
     btn.disabled = false;
-    btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z"/></svg><span>Kirim Laporan</span>`;
+    const ico = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z"/></svg>`;
+    btn.innerHTML = ico+`<span id="submitBtnLabel">Kirim Laporan</span>`;
   }
 }
+
+// Helper: push data ke GAS
+async function _pushToGAS(newReport, woRef, status, isAdhoc, adhocTitle, area, date){
+  if(!GAS_URL) return;
+  try {
+    const getRes  = await fetch(GAS_URL,{cache:'no-cache'});
+    const current = await getRes.json();
+
+    // Rebuild techReports dari myReports lokal
+    current.techReports = state.myReports.map(r=>({
+      ...r,
+      photos:(r.photos||[]).map(p=>({url:p.url,thumb:p.thumb}))
+    })).slice(0,200);
+
+    // Update WO status jika ada woRef
+    if(newReport && woRef && status){
+      const woList = current.wo||[];
+      const idx = woList.findIndex(w=>w.no===woRef||w.id===woRef);
+      if(idx>-1){
+        woList[idx].status   = status==='done'?'done':status==='progress'?'progress':woList[idx].status;
+        woList[idx].progress = status==='done'?100:status==='progress'?50:woList[idx].progress||0;
+        if(newReport?.work) woList[idx].action = newReport.work;
+        current.wo = woList;
+      }
+    }
+
+    // Buat WO adhoc baru jika belum ada
+    if(newReport && isAdhoc && !newReport.parentId){
+      const woList = current.wo||[];
+      const woNo   = 'WO-ADH-'+newReport.id.slice(0,6).toUpperCase();
+      if(!woList.find(w=>w.desc===adhocTitle&&w.date===date)){
+        woList.unshift({
+          id:newReport.id+'_wo', no:woNo, date,
+          type:'corrective', machine:area,
+          desc:adhocTitle||newReport.work, priority:'M',
+          pic:newReport.tech, status:status==='done'?'done':'progress',
+          progress:status==='done'?100:50,
+          action:newReport.work, source:'adhoc',
+          createdAt:new Date().toISOString(),
+        });
+        current.wo = woList;
+      }
+    }
+
+    await fetch(GAS_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(current)});
+    state.woList = current.wo||state.woList;
+  } catch(e){
+    toast('Tersimpan lokal — sync gagal','warn');
+  }
+}
+
 
 function resetForm(){
   document.getElementById('f-date').value = new Date().toISOString().slice(0,10);
@@ -1173,7 +1347,7 @@ function resetForm(){
 // ════════════════════════════════════════
 function renderMyReports(){
   const el = document.getElementById('myReports');
-  const list = state.myReports.slice(0,10);
+  const list = state.myReports.slice(0,20);
   if(!list.length){
     el.innerHTML = `<div class="empty" style="padding:24px 20px;">
       <div class="empty-icon" style="font-size:28px;">📋</div>
@@ -1183,51 +1357,239 @@ function renderMyReports(){
   }
   const statusLabel = {open:'Open',progress:'In Progress',done:'Done',onhold:'On Hold'};
   const statusCls   = {open:'rs-open',progress:'rs-progress',done:'rs-done',onhold:'rs-onhold'};
-  el.innerHTML = list.map(r=>`
-    <div class="report-card" onclick="openReportDetail('${r.id}')">
-      <div class="report-date">${fmtDate(r.date)} · ${r.timeStart}–${r.timeEnd}</div>
-      <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:4px;">
-        <div class="report-title" style="flex:1;min-width:0;">${(r.adhocTitle||r.work).slice(0,55)}${(r.adhocTitle||r.work).length>55?'...':''}</div>
+  const statusIcon  = {open:'🔵',progress:'🟡',done:'🟢',onhold:'🔴'};
+
+  // Group by woRef untuk tampilkan flow
+  const grouped = {}; // woRef → [reports]
+  list.forEach(r=>{
+    const key = r.woRef || r.plan || ('adhoc_'+r.id);
+    if(!grouped[key]) grouped[key]=[];
+    grouped[key].push(r);
+  });
+
+  el.innerHTML = list.map(r=>{
+    const isDone = r.status === 'done';
+    const canUpdate = !isDone; // bisa update jika belum done
+
+    // Hitung durasi
+    let dur = '';
+    if(r.timeStart && r.timeEnd){
+      const [sh,sm] = r.timeStart.split(':').map(Number);
+      const [eh,em] = r.timeEnd.split(':').map(Number);
+      const mnt = Math.max(0,(eh*60+em)-(sh*60+sm));
+      dur = mnt>0 ? (mnt>=60?`${Math.floor(mnt/60)}j${mnt%60>0?' '+mnt%60+'m':''}`:mnt+'m') : '';
+    }
+
+    return `
+    <div class="report-card" style="border-left:3px solid ${r.status==='done'?'var(--green)':r.status==='onhold'?'var(--red)':r.status==='progress'?'var(--amber)':'var(--accent)'};">
+
+      <!-- Header -->
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:6px;">
+        <div style="flex:1;min-width:0;">
+          <div class="report-date">${fmtDate(r.date)} · ${r.timeStart}–${r.timeEnd}${dur?' · ⏱'+dur:''}</div>
+          <div class="report-title">${(r.adhocTitle||r.work).slice(0,60)}${(r.adhocTitle||r.work).length>60?'...':''}</div>
+        </div>
+        <span class="rep-status ${statusCls[r.status]||'rs-progress'}" style="flex-shrink:0;margin-top:2px;">
+          ${statusIcon[r.status]||'🟡'} ${statusLabel[r.status]||r.status}
+        </span>
       </div>
-      <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
-        ${r.status?`<span class="rep-status ${statusCls[r.status]||'rs-progress'}">${statusLabel[r.status]||r.status}</span>`:''}
+
+      <!-- Meta -->
+      <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:${r.photos?.length?'8px':'4px'};">
         ${r.isAdhoc?`<span class="rep-status rs-adhoc">⚡ Ad-hoc</span>`:''}
         <span style="font-size:10px;color:var(--text2);">📍 ${r.area}${r.woRef?' · 🔧 '+r.woRef:''}</span>
       </div>
-      ${r.photos?.length?`<div style="display:flex;gap:4px;margin-top:8px;">
-        ${r.photos.slice(0,4).map(p=>`<img src="${p.thumb||p.dataUrl}" class="wo-photo-thumb"
-          onclick="event.stopPropagation();openLightboxUrls([${r.photos.map(x=>`'${x.dataUrl||x.url}'`).join(',')}],0)">`).join('')}
+
+      <!-- Foto -->
+      ${r.photos?.length?`<div style="display:flex;gap:4px;margin-bottom:8px;flex-wrap:wrap;">
+        ${r.photos.slice(0,4).map(p=>`<img src="${p.thumb||p.dataUrl||p.url}" style="width:50px;height:50px;border-radius:7px;object-fit:cover;border:1px solid var(--border);cursor:pointer;"
+          onclick="event.stopPropagation();openLightboxUrls([${r.photos.map(x=>`'${x.dataUrl||x.url||x.thumb}'`).join(',')}],0)">`).join('')}
       </div>`:''}
-    </div>`).join('');
+
+      <!-- Action buttons -->
+      <div style="display:flex;gap:7px;margin-top:2px;">
+        ${canUpdate?`
+        <button onclick="startUpdateLanjutan('${r.id}')"
+          style="flex:1;padding:10px 8px;background:var(--accent);border:none;border-radius:8px;
+                 color:#fff;font-family:var(--sans);font-size:12px;font-weight:700;cursor:pointer;
+                 display:flex;align-items:center;justify-content:center;gap:5px;">
+          🔄 <span>Update Lanjutan</span>
+        </button>`:''}
+        <button onclick="startEditReport('${r.id}')"
+          style="${canUpdate?'flex:0 0 auto;padding:10px 14px;':'flex:1;padding:10px 8px;'}background:transparent;border:1.5px solid var(--border);border-radius:8px;
+                 color:var(--text2);font-family:var(--sans);font-size:12px;font-weight:700;cursor:pointer;
+                 display:flex;align-items:center;justify-content:center;gap:5px;">
+          ✏️ ${canUpdate?'Edit':'Lihat / Edit'}
+        </button>
+        <button onclick="openReportDetail('${r.id}')"
+          style="flex:0 0 auto;padding:10px 12px;background:transparent;border:1.5px solid var(--border);border-radius:8px;
+                 color:var(--text3);font-family:var(--sans);font-size:12px;cursor:pointer;">
+          👁
+        </button>
+      </div>
+    </div>`;
+  }).join('');
 }
 
 function openReportDetail(id){
   const r = state.myReports.find(x=>x.id===id);
   if(!r) return;
-  const imgs = (r.photos||[]).map(p=>p.dataUrl||p.url).filter(Boolean);
 
-  document.getElementById('sheet-title').textContent = r.work.slice(0,50);
-  document.getElementById('sheet-chips').innerHTML = `
-    <span class="wo-chip chip-cyan">${r.area}</span>
-    <span class="wo-chip chip-gray">${r.date}</span>
-    <span class="wo-chip chip-blue">${r.timeStart}–${r.timeEnd}</span>`;
+  const SL = {open:'Open',progress:'In Progress',done:'Done',onhold:'On Hold'};
+  const SC = {open:'rs-open',progress:'rs-progress',done:'rs-done',onhold:'rs-onhold'};
+  const SI = {open:'🔵',progress:'🟡',done:'🟢',onhold:'🔴'};
 
-  document.getElementById('sheet-body-content').innerHTML = `
-    ${field('Teknisi', r.tech)}
-    ${field('Area / Unit', r.area)}
-    ${r.plan?field('WO / Plan', r.plan):''}
-    ${field('Pekerjaan', r.work)}
-    ${field('Waktu', r.timeStart + ' — ' + r.timeEnd)}
-    ${r.notes?field('Keterangan', r.notes):''}
-    ${imgs.length?`<div class="sheet-field">
-      <div class="sheet-field-label">Foto Dokumentasi</div>
-      <div class="sheet-photos">
-        ${imgs.map((url,i)=>`<img src="${url}" class="sheet-photo" onclick="openLightboxUrls([${imgs.map(u=>`'${u}'`).join(',')}],${i})">`).join('')}
-      </div>
-    </div>`:''}`;
+  // Gather updates (laporan lanjutan yang punya parentId = id ini)
+  const updates = state.myReports
+    .filter(u => u.parentId === id)
+    .sort((a,b) => a.createdAt.localeCompare(b.createdAt));
+  const allReps = [r, ...updates];
+
+  // Total durasi
+  let totalMenit = 0;
+  allReps.forEach(function(rep){
+    if(rep.timeStart && rep.timeEnd){
+      var sh = parseInt(rep.timeStart.split(':')[0],10);
+      var sm = parseInt(rep.timeStart.split(':')[1],10);
+      var eh = parseInt(rep.timeEnd.split(':')[0],10);
+      var em = parseInt(rep.timeEnd.split(':')[1],10);
+      totalMenit += Math.max(0, (eh*60+em) - (sh*60+sm));
+    }
+  });
+  var durH = Math.floor(totalMenit/60);
+  var durM = totalMenit % 60;
+  var totalDur = totalMenit > 0
+    ? (durH > 0 ? durH+'j ' : '') + (durM > 0 ? durM+'m' : '')
+    : '—';
+
+  document.getElementById('sheet-title').textContent =
+    (r.adhocTitle || r.work || 'Laporan').slice(0,50);
+
+  document.getElementById('sheet-chips').innerHTML =
+    '<span class="wo-chip chip-cyan">' + r.area + '</span> ' +
+    '<span class="wo-chip ' + (SC[r.status]||'chip-amber') + '">' +
+      (SI[r.status]||'🟡') + ' ' + (SL[r.status]||r.status) +
+    '</span>' +
+    (r.woRef ? '<span class="wo-chip chip-gray">🔧 ' + r.woRef + '</span>' : '') +
+    (r.isAdhoc ? '<span class="wo-chip chip-amber">⚡ Ad-hoc</span>' : '');
+
+  // Helper: build one timeline block (no nested backticks)
+  function buildBlock(rep, label) {
+    var imgs = (rep.photos || [])
+      .map(function(p){ return p.dataUrl || p.url || p.thumb || ''; })
+      .filter(Boolean);
+
+    var dur = '';
+    if(rep.timeStart && rep.timeEnd){
+      var sh2 = parseInt(rep.timeStart.split(':')[0],10);
+      var sm2 = parseInt(rep.timeStart.split(':')[1],10);
+      var eh2 = parseInt(rep.timeEnd.split(':')[0],10);
+      var em2 = parseInt(rep.timeEnd.split(':')[1],10);
+      var mnt = Math.max(0,(eh2*60+em2)-(sh2*60+sm2));
+      if(mnt > 0){
+        var hh = Math.floor(mnt/60), mm = mnt%60;
+        dur = (hh>0?hh+'j ':'') + (mm>0?mm+'m':'');
+      }
+    }
+
+    var dotColor = rep.status==='done'?'var(--green)':
+                   rep.status==='progress'?'var(--amber)':'var(--accent)';
+
+    var photoHtml = '';
+    if(imgs.length){
+      var thumbs = imgs.map(function(url, i){
+        var allQ = imgs.map(function(u){ return "'" + u + "'"; }).join(',');
+        return '<img src="' + url + '" '
+          + 'style="width:60px;height:60px;border-radius:8px;object-fit:cover;'
+          + 'border:1px solid var(--border);cursor:pointer;" '
+          + 'onclick="openLightboxUrls([' + allQ + '],' + i + ')">';
+      }).join('');
+      photoHtml = '<div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:8px;">'
+        + thumbs + '</div>';
+    }
+
+    var notesHtml = rep.notes
+      ? '<div style="font-size:11px;color:var(--text2);background:var(--surface2);'
+        + 'padding:6px 10px;border-radius:6px;margin-top:4px;">💬 '
+        + rep.notes + '</div>'
+      : '';
+
+    return '<div style="position:relative;padding-left:20px;margin-bottom:16px;">'
+      + '<div style="position:absolute;left:0;top:4px;width:10px;height:10px;'
+        + 'border-radius:50%;background:' + dotColor + ';'
+        + 'border:2px solid var(--surface);"></div>'
+      + '<div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-bottom:4px;">'
+        + label + ' &nbsp;·&nbsp; ' + fmtDate(rep.date)
+        + ' &nbsp;·&nbsp; ⏰ ' + (rep.timeStart||'—') + '–' + (rep.timeEnd||'—')
+        + (dur ? ' (' + dur + ')' : '')
+      + '</div>'
+      + '<div style="display:flex;gap:6px;margin-bottom:5px;flex-wrap:wrap;">'
+        + '<span class="rep-status ' + (SC[rep.status]||'rs-progress') + '">'
+          + (SI[rep.status]||'🟡') + ' ' + (SL[rep.status]||rep.status||'—')
+        + '</span>'
+      + '</div>'
+      + '<div style="font-size:13px;line-height:1.5;">' + (rep.work||'—') + '</div>'
+      + notesHtml
+      + photoHtml
+    + '</div>';
+  }
+
+  // Summary stats row
+  var totalPhotos = allReps.reduce(function(a,rep){ return a+(rep.photos||[]).length; }, 0);
+  var statsHtml =
+    '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px;">'
+    + '<div style="background:var(--surface2);border-radius:8px;padding:10px;text-align:center;">'
+      + '<div style="font-family:var(--mono);font-size:18px;font-weight:700;">' + allReps.length + '</div>'
+      + '<div style="font-size:9px;color:var(--text3);">Update</div></div>'
+    + '<div style="background:var(--surface2);border-radius:8px;padding:10px;text-align:center;">'
+      + '<div style="font-family:var(--mono);font-size:18px;font-weight:700;">' + totalPhotos + '</div>'
+      + '<div style="font-size:9px;color:var(--text3);">Foto</div></div>'
+    + '<div style="background:var(--surface2);border-radius:8px;padding:10px;text-align:center;">'
+      + '<div style="font-family:var(--mono);font-size:14px;font-weight:700;">' + totalDur + '</div>'
+      + '<div style="font-size:9px;color:var(--text3);">Total Waktu</div></div>'
+    + '</div>';
+
+  // Info rows
+  var infoHtml = field('Teknisi', r.tech)
+    + (r.woRef ? field('WO Terkait', r.woRef) : '');
+
+  // Timeline header
+  var tlHead = '<div style="font-family:var(--mono);font-size:9px;color:var(--text3);'
+    + 'letter-spacing:1.5px;text-transform:uppercase;margin:10px 0 8px;'
+    + 'display:flex;align-items:center;gap:6px;">'
+    + '📋 Timeline Laporan'
+    + '<div style="flex:1;height:1px;background:var(--border);"></div></div>';
+
+  // Build timeline
+  var timelineHtml = '<div style="border-left:2px solid var(--border);margin-left:4px;">'
+    + buildBlock(r, '📋 Laporan Awal');
+  updates.forEach(function(u, i){
+    timelineHtml += buildBlock(u, '🔄 Update ' + (i+1));
+  });
+  timelineHtml += '</div>';
+
+  // Action buttons
+  var btnUpdate = r.status !== 'done'
+    ? '<button class="btn-primary" style="margin-bottom:8px;" '
+      + 'onclick="startUpdateLanjutan(\'' + r.id + '\');closeSheetDirect();">'
+      + '🔄 Tambah Update Lanjutan</button>'
+    : '<div style="text-align:center;padding:10px;font-size:12px;color:var(--green);">'
+      + '✅ Pekerjaan sudah selesai (Done)</div>';
+
+  var btnEdit = '<button class="btn-primary" '
+    + 'style="background:transparent;border:1.5px solid var(--border);'
+    + 'color:var(--text2);box-shadow:none;" '
+    + 'onclick="startEditReport(\'' + r.id + '\');closeSheetDirect();">'
+    + '✏️ Edit Laporan Awal</button>';
+
+  document.getElementById('sheet-body-content').innerHTML =
+    statsHtml + infoHtml + tlHead + timelineHtml
+    + '<div style="height:8px;"></div>'
+    + btnUpdate + btnEdit;
 
   document.getElementById('woSheet').classList.add('open');
 }
+
 
 // ════════════════════════════════════════
 // WO LIST
